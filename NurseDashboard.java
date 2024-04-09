@@ -54,12 +54,14 @@ public class NurseDashboard {
         Button viewMedicalHistoryButton = new Button("View Medical History");
         Button makeAppointmentButton = new Button("Make Appointment");
         Button sendMessageToPatientButton = new Button("Send Message to Patient");
+        Button takeVitalsButton = new Button("Take Vitals"); // Added button for taking vitals
 
 
         // Set action handlers for buttons (if needed)
         viewMedicalHistoryButton.setOnAction(e -> viewMedicalHistory());
         makeAppointmentButton.setOnAction(e -> makeAppointment());
         sendMessageToPatientButton.setOnAction(e -> sendMessageToPatient());
+        takeVitalsButton.setOnAction(e -> takeVitals()); // Action handler for taking vitals
 
 
         // Layout for patient dashboard
@@ -210,5 +212,67 @@ private void viewMedicalHistory() {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    private void takeVitals() {
+        Stage vitalsStage = new Stage();
+        vitalsStage.setTitle("Take Vitals");
+
+        // Create labels and text fields for vitals input
+        Label weightLabel = new Label("Weight (kg):");
+        TextField weightField = new TextField();
+
+        Label heightLabel = new Label("Height (cm):");
+        TextField heightField = new TextField();
+
+        Label temperatureLabel = new Label("Body Temperature (°C):");
+        TextField temperatureField = new TextField();
+
+        Label bloodPressureLabel = new Label("Blood Pressure (mmHg):");
+        TextField bloodPressureField = new TextField();
+
+        Label oxygenLevelLabel = new Label("Oxygen Level (%):");
+        TextField oxygenLevelField = new TextField();
+
+        Button saveButton = new Button("Save");
+        saveButton.setOnAction(e -> {
+            // Validate input data
+            double weight = Double.parseDouble(weightField.getText());
+            double height = Double.parseDouble(heightField.getText());
+            double temperature = Double.parseDouble(temperatureField.getText());
+            String bloodPressure = bloodPressureField.getText();
+            double oxygenLevel = Double.parseDouble(oxygenLevelField.getText());
+
+            // Save the inputted vital signs to the system or database
+            saveVitals(weight, height, temperature, bloodPressure, oxygenLevel);
+            
+            vitalsStage.close();
+        });
+
+        // Create grid layout for the vitals input fields
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.addRow(0, weightLabel, weightField);
+        gridPane.addRow(1, heightLabel, heightField);
+        gridPane.addRow(2, temperatureLabel, temperatureField);
+        gridPane.addRow(3, bloodPressureLabel, bloodPressureField);
+        gridPane.addRow(4, oxygenLevelLabel, oxygenLevelField);
+        gridPane.addRow(5, saveButton);
+
+        Scene scene = new Scene(gridPane, 400, 300);
+        vitalsStage.setScene(scene);
+        vitalsStage.show();
+    }
+
+    private void saveVitals(double weight, double height, double temperature, String bloodPressure, double oxygenLevel) {
+        // Implement logic to save the inputted vital signs to the system or database
+        System.out.println("Vitals saved:");
+        System.out.println("Weight: " + weight + " lbs");
+        System.out.println("Height: " + height + " cm");
+        System.out.println("Temperature: " + temperature + " °F");
+        System.out.println("Blood Pressure: " + bloodPressure + " mmHg");
+        System.out.println("Oxygen Level: " + oxygenLevel + " %");
     }
 }

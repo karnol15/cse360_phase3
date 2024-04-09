@@ -21,9 +21,6 @@ import java.util.Optional;
 
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DateCell;
-
-import javafx.scene.control.TextField;
-
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
@@ -214,5 +211,130 @@ private void showError(String title, String message) {
     alert.showAndWait();
     }
 
+    private void inputPhysicalData() {
+        Label findingsLabel = new Label("New Findings:");
+        TextArea findingsTextArea = new TextArea();
+        findingsTextArea.setWrapText(true);
+        findingsTextArea.setPromptText("Enter new findings here");
+    
+        // Create a button to save the entered findings
+        Button saveButton = new Button("Save Findings");
+        saveButton.setOnAction(e -> {
+            // Retrieve the entered findings
+            String findings = findingsTextArea.getText();
+    
+            // Validate the entered findings
+            if (!findings.isEmpty()) {
+                // Perform saving logic here (e.g., save findings to database)
+                // Display a confirmation message
+                showConfirmation("Findings Saved", "New findings have been successfully recorded.");
+            } else {
+                // Display an error message if the findings are empty
+                showError("Error", "Please enter new findings before saving.");
+            }
+        });
+    
+        // Create a layout to arrange the input components
+        VBox inputLayout = new VBox(10);
+        inputLayout.getChildren().addAll(findingsLabel, findingsTextArea, saveButton);
+        inputLayout.setAlignment(Pos.CENTER);
+        inputLayout.setPadding(new Insets(20));
+    
+        // Create a new stage for recording findings
+        Stage findingsStage = new Stage();
+        findingsStage.setTitle("Record Findings");
+        findingsStage.setScene(new Scene(inputLayout));
+        findingsStage.show();
+    }
+    
+    // Helper method to display confirmation message
+    private void showConfirmation(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    // Helper method to display error message
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
+
+    private void prescribeMedication() {
+        // Create labels and text fields for medication details
+        Label medicationNameLabel = new Label("Medication Name:");
+        TextField medicationNameField = new TextField();
+    
+        Label dosageLabel = new Label("Dosage:");
+        TextField dosageField = new TextField();
+    
+        Label frequencyLabel = new Label("Frequency:");
+        TextField frequencyField = new TextField();
+    
+        Label instructionsLabel = new Label("Instructions:");
+        TextField instructionsField = new TextField();
+    
+        // Create a button to prescribe medication
+        Button prescribeButton = new Button("Prescribe Medication");
+        prescribeButton.setOnAction(e -> {
+            // Retrieve the entered medication details
+            String medicationName = medicationNameField.getText();
+            String dosage = dosageField.getText();
+            String frequency = frequencyField.getText();
+            String instructions = instructionsField.getText();
+    
+            // Validate the entered data
+            if (!medicationName.isEmpty() && !dosage.isEmpty() && !frequency.isEmpty()) {
+                // Perform logic to save the prescribed medication (e.g., save to database)
+                // Display a confirmation message
+                showConfirmation("Medication Prescribed", "Medication has been successfully prescribed.");
+            } else {
+                // Display an error message if any essential field is empty
+                showError("Error", "Please fill out all required fields before prescribing medication.");
+            }
+        });
+    
+        // Create a layout to arrange the input components
+        VBox inputLayout = new VBox(10);
+        inputLayout.getChildren().addAll(medicationNameLabel, medicationNameField, dosageLabel, dosageField,
+                frequencyLabel, frequencyField, instructionsLabel, instructionsField, prescribeButton);
+        inputLayout.setAlignment(Pos.CENTER);
+        inputLayout.setPadding(new Insets(20));
+    
+        // Create a new stage for prescribing medication
+        Stage prescribeMedicationStage = new Stage();
+        prescribeMedicationStage.setTitle("Prescribe Medication");
+        prescribeMedicationStage.setScene(new Scene(inputLayout));
+        prescribeMedicationStage.show();
+    }
+
+    
+
+    private void viewHealthHistory() {
+        // Retrieve the patient's health history from the database or data structure
+        String patientUsername = "patient_username"; // Replace with actual patient's username
+        String healthHistory = retrieveHealthHistory(patientUsername);
+    
+        // Display the health history in an alert dialog
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Health History");
+        alert.setHeaderText("Health History for " + patientFirstName + " " + patientLastName);
+        alert.setContentText(healthHistory);
+        alert.showAndWait();
+    }
+    
+    // Method to retrieve health history from the database or data structure
+    private String retrieveHealthHistory(String patientUsername) {
+        // Placeholder method to simulate retrieving health history
+        // Replace this with actual logic to retrieve health history from files .txt
+        // For demonstration purposes, returning dummy health history
+        return "Patient's health history goes here...";
+    }
+    
 }
