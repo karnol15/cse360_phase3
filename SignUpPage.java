@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class SignUpPage {
     private Stage primaryStage;
@@ -34,6 +35,23 @@ public class SignUpPage {
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
+
+        Label usernameLabel = new Label("Generated Username:");
+        Label generatedUsernameLabel = new Label();
+
+        Button generateUsernameButton = new Button("Generate Username");
+        generateUsernameButton.setOnAction(e -> {
+            String firstName = firstNameField.getText();
+            String lastName = lastNameField.getText();
+            LocalDate birthday = birthdayPicker.getValue();
+            if (firstName.isEmpty() || lastName.isEmpty() || birthday == null) {
+                showError("Error", "Please fill out First Name, Last Name, and Birthday.");
+                return;
+            }
+            String formattedBirthday = DateTimeFormatter.ofPattern("MMddyy").format(birthday);
+            String generatedUsername = generateUsername(firstName, lastName, formattedBirthday);
+            generatedUsernameLabel.setText(generatedUsername);
+        });
 
         Button signUpButton = new Button("Sign Up");
         signUpButton.setOnAction(e -> {
