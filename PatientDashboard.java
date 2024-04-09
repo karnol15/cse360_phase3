@@ -14,13 +14,14 @@ public class PatientDashboard {
     private String patientLastName;
     private int patientAge;
     private String patientBirthday;
+    User rlUser;
 
-    public PatientDashboard(Stage primaryStage, String firstName, String lastName, int age, String birthday) {
+    public PatientDashboard(Stage primaryStage, User rlUser) {
         this.primaryStage = primaryStage;
-        this.patientFirstName = firstName;
-        this.patientLastName = lastName;
-        this.patientAge = age;
-        this.patientBirthday = birthday;
+        this.patientFirstName = rlUser.getFName();
+        this.patientLastName = rlUser.getLName();
+        this.patientAge = rlUser.getAge();
+        this.patientBirthday = rlUser.getbDay();
     }
 
     public void show() {

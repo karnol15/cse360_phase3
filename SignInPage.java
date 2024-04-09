@@ -93,11 +93,12 @@ public class SignInPage {
                 String password = passwordField.getText();
 
                 // Perform authentication logic
-                boolean isAuthenticated = authenticate(username, password);
+                User userFound = authenticate(username, password);
+                
 
-                if (isAuthenticated) {
+                if (userFound != null) {
                     // Authentication successful, open dashboard based on role
-                    openNurseDashboard(username);
+                    openNurseDashboard(userFound);
                 } else {
                     // Authentication failed, show error message
                     showError("Error", "Incorrect username or password. Please try again.");
@@ -107,18 +108,20 @@ public class SignInPage {
         
     }
 
-    private boolean authenticate(String username, String password) {
-        // Perform authentication logic here
-        // Will need to implement file checking logic
-        // right now its a hardcoded check
-        return username.equals("admin") && password.equals("admin");
+    private User authenticate(String username, String password) {
+        if (Main.userMap.containsKey(username)) {
+        	if (password.hashCode() == Main.userMap.get(username).getHash()) {
+        		return Main.userMap.get(username);
+        	}
+        }
+        return null;
     }
 
-    private void openNurseDashboard(String username) {
+    private void openNurseDashboard(User rlUser) {
         // Open dashboard based on the role of the user
         // For demonstration purposes, let's assume there is only one dashboard for all users
         // Replace "DashboardPage" with the appropriate dashboard class based on the user's role
-        NurseDashboard dashboardPage = new NurseDashboard(primaryStage, "john", "doe", 30, "today");
+        NurseDashboard dashboardPage = new NurseDashboard(primaryStage, rlUser);
         dashboardPage.show();
     }
     
