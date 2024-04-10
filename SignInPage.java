@@ -99,25 +99,32 @@ public class SignInPage {
                 String password = passwordField.getText();
 
                 // Perform authentication logic
-                boolean isAuthenticated = authenticate(username, password);
-
-                if (isAuthenticated) {
+                User userType = authenticate(username, password);
+                
+                if (userType instanceof Nurse) {
                     // Authentication successful, open dashboard based on role
                     openNurseDashboard(username);
-                } else {
+                } else if (userType instanceof Doctor) {
+                	
+                	openDoctorDashboard(username);
                     // Authentication failed, show error message
-                    showError("Error", "Incorrect username or password. Please try again.");
                 }
+                else {showError("Error", "Incorrect username or password. Please try again.");}
             }
         });
         
     }
 
-    private boolean authenticate(String username, String password) {
+    private User authenticate(String username, String password) {
         // Perform authentication logic here
         // Will need to implement file checking logic
         // right now its a hardcoded check
-        return username.equals("admin") && password.equals("admin");
+    	if (Main.userMap.containsKey(username)) {
+    		if (Main.userMap.get(username).getHash() == password.hashCode()) {
+    			return Main.userMap.get(username);
+    		}
+    	}
+        return null;
     }
 
     private void openNurseDashboard(String username) {

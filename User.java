@@ -19,7 +19,13 @@ public class User implements Serializable {
 	public String getFName() {return fName;}
 	public String getLName() {return lName;}
 	public String getbDay() {return birthday.toString();}
-	public int getAge() {return LocalDate.now().compareTo(birthday) - 1;}
+	public int getAge() {
+		
+		if (LocalDate.now().compareTo(birthday) - 1 <= 0) {
+			return 0;
+		}
+		return LocalDate.now().compareTo(birthday) - 1;
+	}
 
 	
 	public int getHash() {
