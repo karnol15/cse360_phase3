@@ -1,7 +1,6 @@
 
 import java.util.HashMap;
-
-
+import java.util.Random;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,10 +13,13 @@ import java.time.format.DateTimeFormatter;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.util.Random;
+
 public class Main extends Application {
 	
 	public static HashMap<String, User> userMap = new HashMap<>();
 	
+	@SuppressWarnings("unchecked")
 	public void init() {
 		
 		try {
@@ -35,7 +37,7 @@ public class Main extends Application {
         		System.out.println("null");
         	}
         	
-        	} catch (Exception e1) {System.out.println("didn't work");}
+        	} catch (Exception e1) {System.out.println("Files are corrupted. Delete old files and try again.");}
 		
 	}
 
@@ -68,15 +70,28 @@ public class Main extends Application {
 		
 	}
 	
-	public static void newUser(String fName, String lName, LocalDate bday, String password) {
+	public static void newUser(String fName, String lName, LocalDate bday, String password, int type) {
 		
 		//logic to form the userName
 		String formattedBirthday = DateTimeFormatter.ofPattern("MMddyy").format(bday);
 		
 		String patientID = fName.substring(0, 1) + lName + formattedBirthday.substring(0,4);
 		
-		userMap.putIfAbsent(patientID, new User(fName, lName, bday, password.hashCode()));
+		switch (type) {
+		case 0:
+			userMap.putIfAbsent(patientID, new Patient(fName, lName, bday, password.hashCode()));
+		case 1:
+			userMap.putIfAbsent(patientID, new Nurse(fName, lName, bday, password.hashCode()));
+		case 2:
+			userMap.putIfAbsent(patientID, new Doctor(fName, lName, bday, password.hashCode()));
+		}
+		
 	}
+	
+	private int genPatID() {
+        Random rand = new Random();
+        return rand.nextInt(90000) + 10000;
+    }
 
     public static void main(String[] args) {
         launch(args);

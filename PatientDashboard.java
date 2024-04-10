@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class PatientDashboard {
+	private Patient user;
     private Stage primaryStage;
     private String patientFirstName;
     private String patientLastName;
@@ -17,6 +18,7 @@ public class PatientDashboard {
     private String patientBirthday;
 
     public PatientDashboard(Stage primaryStage, User rlUser) {
+    	user = (Patient)rlUser;
         this.primaryStage = primaryStage;
         this.patientFirstName = rlUser.getFName();
         this.patientLastName = rlUser.getLName();
@@ -70,15 +72,14 @@ public class PatientDashboard {
         
         viewContactInfoButton.setOnAction(new EventHandler<>() {
             public void handle(ActionEvent event) {
-            	SignInPage signInPage = new SignInPage(primaryStage);
-                signInPage.show();
+            	System.out.println(user.getContactInfo());
             }
         });
         
         //this changes the scene to update contact info
         updateContactInfoButton.setOnAction(new EventHandler<>() {
             public void handle(ActionEvent event) {
-            	SignUpPage signUpPage = new SignUpPage(primaryStage);
+            	UpdateContactInfo signUpPage = new UpdateContactInfo(primaryStage, user);
                 signUpPage.show();
             }
         });
@@ -90,7 +91,7 @@ public class PatientDashboard {
             }
         });
         
-        //this changes the scenne to update contact info
+        //this changes the scene to update contact info
         sendMessageToStaffButton.setOnAction(new EventHandler<>() {
             public void handle(ActionEvent event) {
             	SignUpPage signUpPage = new SignUpPage(primaryStage);

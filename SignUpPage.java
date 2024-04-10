@@ -7,15 +7,18 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.control.RadioButton;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class SignUpPage {
     private Stage primaryStage;
+    ToggleGroup occupation;
 
     public SignUpPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -35,23 +38,35 @@ public class SignUpPage {
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
-
-       
-       
-
-        Button signUpButton = new Button("Sign Up");
         
+        RadioButton doctor = new RadioButton("Doctor");
+        RadioButton nurse = new RadioButton("Nurse");
+        RadioButton patient = new RadioButton("Patient");
+        
+        occupation = new ToggleGroup();
+        doctor.setToggleGroup(occupation);
+        nurse.setToggleGroup(occupation);
+        patient.setToggleGroup(occupation);
+       
+       
+
+        Button signUpButton = new Button("Sign Up");       
 
         Button cancelButton = new Button("Cancel");
+        
         
 
         HBox buttonLayout = new HBox(10);
         buttonLayout.getChildren().addAll(signUpButton, cancelButton);
         buttonLayout.setAlignment(Pos.CENTER);
+        
+        HBox radioButtons = new HBox(10);
+        radioButtons.getChildren().addAll(doctor, nurse, patient);
+        radioButtons.setAlignment(Pos.CENTER);
 
         VBox layout = new VBox(10);
         layout.getChildren().addAll(firstNameLabel, firstNameField, lastNameLabel, lastNameField,
-                birthdayLabel, birthdayPicker, passwordLabel, passwordField, buttonLayout);
+                birthdayLabel, birthdayPicker, passwordLabel, passwordField, radioButtons, buttonLayout);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
@@ -65,11 +80,15 @@ public class SignUpPage {
             String lastName = lastNameField.getText();
             LocalDate birthday = birthdayPicker.getValue();
             String password = passwordField.getText();
+            int type = 0;
 
             if (validateFields(firstName, lastName, birthday, password)) {
                 // Perform sign-up logic here (e.g., save user to database)
                 // For simplicity, we'll just display a confirmation message
-            	Main.newUser(firstName, lastName, birthday, password);
+            	if (occupation.getSelectedToggle() == patient) {type = 0;}
+            	else if(occupation.getSelectedToggle() == nurse) {type = 1;}
+            	else if(occupation.getSelectedToggle() == doctor) {type = 2;}
+            	Main.newUser(firstName, lastName, birthday, password, type);
             	
             	// Generate patient ID
                 String formattedBirthday = DateTimeFormatter.ofPattern("MMddyy").format(birthday);
@@ -90,7 +109,7 @@ public class SignUpPage {
     }
 
     private boolean validateFields(String firstName, String lastName, LocalDate birthday, String password) {
-        if (firstName.isEmpty() || lastName.isEmpty() || birthday == null || password.isEmpty()) {
+        if (firstName.isEmpty() || lastName.isEmpty() || birthday == null || password.isEmpty() || occupation.getSelectedToggle() == null) {
             showError("Error", "Please fill out all fields.");
             return false;
         }
