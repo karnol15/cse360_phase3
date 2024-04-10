@@ -17,6 +17,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javafx.scene.control.ButtonType;
@@ -168,34 +169,16 @@ public class DoctorDashboard {
 	private void openSendMessagePopup() {
 	    // Create a new stage for the popup
 	    Stage popupStage = new Stage();
-	    popupStage.setTitle("Send Message to Patient");
-	
-	    // Create text area for inputting message
-	    TextArea messageTextArea = new TextArea();
-	    messageTextArea.setWrapText(true);
-	    messageTextArea.setPromptText("Enter your message here");
-	
-	    // Create button for sending message
-	    Button sendButton = new Button("Send");
-	    sendButton.setOnAction(e -> {
-	        String messageContent = messageTextArea.getText();
-	        if (!messageContent.isEmpty()) {
-	            sendMessageToPatient(messageContent);
-	            popupStage.close();
-	        } else {
-	            // Show error message if message content is empty
-	            showError("Error", "Message content cannot be empty");
-	        }
-	    });
-	
+
 	    // Layout for popup
 	    VBox popupLayout = new VBox(10);
-	    popupLayout.getChildren().addAll(messageTextArea, sendButton);
-	    popupLayout.setAlignment(Pos.CENTER);
-	    popupLayout.setPadding(new Insets(20));
-	
 	    popupStage.setScene(new Scene(popupLayout, 400, 200));
 	    popupStage.show();
+
+        String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday.substring(0,4);
+
+        MessageSystem messageSystem = new MessageSystem(popupStage, userId);
+        messageSystem.show();
 	}
 	
 	

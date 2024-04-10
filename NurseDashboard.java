@@ -19,6 +19,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javafx.scene.control.ButtonType;
@@ -72,7 +73,7 @@ public class NurseDashboard {
         // Set action handlers for buttons (if needed)
         viewMedicalHistoryButton.setOnAction(e -> viewMedicalHistory());
         makeAppointmentButton.setOnAction(e -> makeAppointment());
-        //sendMessageToPatientButton.setOnAction(e -> sendMessageToPatient());
+        sendMessageToPatientButton.setOnAction(e -> openSendMessagePopup());
         takeVitalsButton.setOnAction(e -> takeVitals()); // Action handler for taking vitals
     }
 
@@ -168,43 +169,21 @@ public class NurseDashboard {
     
     // Method to open popup for sending message to patient
     private void openSendMessagePopup() {
-        // Create a new stage for the popup
-        Stage popupStage = new Stage();
-        popupStage.setTitle("Send Message to Patient");
+	    // Create a new stage for the popup
+	    Stage popupStage = new Stage();
 
-        // Create text area for inputting message
-        TextArea messageTextArea = new TextArea();
-        messageTextArea.setWrapText(true);
-        messageTextArea.setPromptText("Enter your message here");
+	    // Layout for popup
+	    VBox popupLayout = new VBox(10);
+	    popupStage.setScene(new Scene(popupLayout, 400, 200));
+	    popupStage.show();
 
-        // Create button for sending message
-        Button sendButton = new Button("Send");
-        sendButton.setOnAction(e -> {
-            String messageContent = messageTextArea.getText();
-            if (!messageContent.isEmpty()) {
-                sendMessageToPatient(messageContent);
-                popupStage.close();
-            } else {
-                // Show error message if message content is empty
-                showError("Error", "Message content cannot be empty");
-            }
-        });
+        String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday;
 
-        // Layout for popup
-        VBox popupLayout = new VBox(10);
-        popupLayout.getChildren().addAll(messageTextArea, sendButton);
-        popupLayout.setAlignment(Pos.CENTER);
-        popupLayout.setPadding(new Insets(20));
-
-        popupStage.setScene(new Scene(popupLayout, 400, 200));
-        popupStage.show();
-    }
+        MessageSystem messageSystem = new MessageSystem(popupStage, userId);
+        messageSystem.show();
+	}
 
     // Helper method to send message to patient
-    private void sendMessageToPatient(String messageContent) {
-        // Logic to send message to patient
-        System.out.println("Message sent to patient: " + messageContent);
-    }
 
     // Helper method to show error messages
     private void showError(String title, String message) {

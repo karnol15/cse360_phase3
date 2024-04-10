@@ -91,20 +91,24 @@ public class PatientDashboard {
             }
         });
         
-        //this changes the scene to update contact info
-        sendMessageToStaffButton.setOnAction(new EventHandler<>() {
-            public void handle(ActionEvent event) {
-            	SignUpPage signUpPage = new SignUpPage(primaryStage);
-                signUpPage.show();
-            }
-        });
-        
+        sendMessageToStaffButton.setOnAction(e -> openSendMessagePopup());
+        //this changes the scene to update contact info        
         
     }
 
-    private Object sendMessageToStaff() {
-		// TODO Auto-generated method stub
-		return null;
+    private void openSendMessagePopup() {
+	    // Create a new stage for the popup
+	    Stage popupStage = new Stage();
+
+	    // Layout for popup
+	    VBox popupLayout = new VBox(10);
+	    popupStage.setScene(new Scene(popupLayout, 400, 200));
+	    popupStage.show();
+
+        String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday;
+
+        MessageSystem messageSystem = new MessageSystem(popupStage, userId);
+        messageSystem.show();
 	}
 
 	private Object viewVisitHistory() {
