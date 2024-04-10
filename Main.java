@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -68,7 +69,13 @@ public class Main extends Application {
 	}
 	
 	public static void newUser(String fName, String lName, LocalDate bday, String password) {
-		userMap.putIfAbsent(fName + lName, new User(fName, lName, bday, password.hashCode()));
+		
+		//logic to form the userName
+		String formattedBirthday = DateTimeFormatter.ofPattern("MMddyy").format(bday);
+		
+		String patientID = fName.substring(0, 1) + lName + formattedBirthday.substring(0,4);
+		
+		userMap.putIfAbsent(patientID, new User(fName, lName, bday, password.hashCode()));
 	}
 
     public static void main(String[] args) {
@@ -80,4 +87,3 @@ public class Main extends Application {
 	
     
 }
-

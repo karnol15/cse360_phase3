@@ -30,7 +30,7 @@ public class SignInPage {
         primaryStage.setTitle("Healthcare Provider Sign In");
         
         Label welcomeLabel = new Label("Staff Login");
-        Label welcomeLabel1 = new Label("Staff Login");
+        
         
         //
         welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 32));
@@ -42,22 +42,23 @@ public class SignInPage {
         doctor.setToggleGroup(loginOptions);
         nurse.setToggleGroup(loginOptions);
         
+        Label staffOption = new Label("I am a :");
+        
+        VBox options = new VBox(10);
+        options.getChildren().addAll(staffOption, doctor, nurse);
         
         // Create an ImageView with the image
         Image image = new Image("stafflogin.jpeg"); 
         ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(500);
         
         // Set preserve ratio to true so that image won't stretch disproportionately
         imageView.setPreserveRatio(true);
-        
-
-        // Bind the fitWidth property of ImageView to the width of the VBox
-        //imageView.fitWidthProperty().bind(primaryStage.widthProperty());
 
         // Create a VBox and add the ImageView to it
         VBox logoBox = new VBox();
-        logoBox.getChildren().add(welcomeLabel1);
-        logoBox.setAlignment(Pos.CENTER);
+        logoBox.getChildren().add(imageView);
+        logoBox.setAlignment(Pos.CENTER_LEFT);
 
         // Set preferred width for the VBox
         logoBox.setPrefWidth(500);
@@ -71,17 +72,22 @@ public class SignInPage {
         Button signInButton = new Button("Sign In");
 
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(welcomeLabel,usernameLabel, usernameField, passwordLabel, passwordField, signInButton);
+        layout.getChildren().addAll(options, usernameLabel, usernameField, passwordLabel, passwordField, signInButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
         layout.setPrefWidth(300);
         
         HBox middleLayout = new HBox(10);
-        middleLayout.getChildren().addAll(logoBox, layout);
+        middleLayout.getChildren().addAll(layout, logoBox);
+        middleLayout.setAlignment(Pos.CENTER_LEFT);
+        
+        VBox finalLayout = new VBox(10);
+        finalLayout.getChildren().addAll(welcomeLabel, middleLayout);
+        finalLayout.setAlignment(Pos.CENTER);
         
         
 
-        primaryStage.setScene(new Scene(middleLayout, 850, 700));
+        primaryStage.setScene(new Scene(finalLayout, 850, 700));
         primaryStage.show();
         
         //handle all events below here
@@ -93,12 +99,11 @@ public class SignInPage {
                 String password = passwordField.getText();
 
                 // Perform authentication logic
-                User userFound = authenticate(username, password);
-                
+                boolean isAuthenticated = authenticate(username, password);
 
-                if (userFound != null) {
+                if (isAuthenticated) {
                     // Authentication successful, open dashboard based on role
-                    openNurseDashboard(userFound);
+                    openNurseDashboard(username);
                 } else {
                     // Authentication failed, show error message
                     showError("Error", "Incorrect username or password. Please try again.");
@@ -108,20 +113,18 @@ public class SignInPage {
         
     }
 
-    private User authenticate(String username, String password) {
-        if (Main.userMap.containsKey(username)) {
-        	if (password.hashCode() == Main.userMap.get(username).getHash()) {
-        		return Main.userMap.get(username);
-        	}
-        }
-        return null;
+    private boolean authenticate(String username, String password) {
+        // Perform authentication logic here
+        // Will need to implement file checking logic
+        // right now its a hardcoded check
+        return username.equals("admin") && password.equals("admin");
     }
 
-    private void openNurseDashboard(User rlUser) {
+    private void openNurseDashboard(String username) {
         // Open dashboard based on the role of the user
         // For demonstration purposes, let's assume there is only one dashboard for all users
         // Replace "DashboardPage" with the appropriate dashboard class based on the user's role
-        NurseDashboard dashboardPage = new NurseDashboard(primaryStage, rlUser);
+        NurseDashboard dashboardPage = new NurseDashboard(primaryStage, "john", "doe", 30, "today");
         dashboardPage.show();
     }
     

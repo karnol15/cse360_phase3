@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class SignUpPage {
     private Stage primaryStage;
@@ -35,23 +36,14 @@ public class SignUpPage {
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
 
-        Button signUpButton = new Button("Sign Up");
-        signUpButton.setOnAction(e -> {
-            String firstName = firstNameField.getText();
-            String lastName = lastNameField.getText();
-            LocalDate birthday = birthdayPicker.getValue();
-            String password = passwordField.getText();
+       
+       
 
-            if (validateFields(firstName, lastName, birthday, password)) {
-                
-            	Main.newUser(firstName, lastName, birthday, password);
-            	
-                showConfirmation(firstName);
-            }
-        });
+        Button signUpButton = new Button("Sign Up");
+        
 
         Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> primaryStage.close());
+        
 
         HBox buttonLayout = new HBox(10);
         buttonLayout.getChildren().addAll(signUpButton, cancelButton);
@@ -63,8 +55,38 @@ public class SignUpPage {
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
-        primaryStage.setScene(new Scene(layout, 800, 750));
+        primaryStage.setScene(new Scene(layout, 500, 450));
         primaryStage.show();
+        
+        //handle all events below here
+        
+        signUpButton.setOnAction(e -> {
+            String firstName = firstNameField.getText();
+            String lastName = lastNameField.getText();
+            LocalDate birthday = birthdayPicker.getValue();
+            String password = passwordField.getText();
+
+            if (validateFields(firstName, lastName, birthday, password)) {
+                // Perform sign-up logic here (e.g., save user to database)
+                // For simplicity, we'll just display a confirmation message
+            	Main.newUser(firstName, lastName, birthday, password);
+            	
+            	// Generate patient ID
+                String formattedBirthday = DateTimeFormatter.ofPattern("MMddyy").format(birthday);
+                String username = generatePatientID(firstName, lastName, formattedBirthday);
+            	showConfirmation(firstName, username);
+                
+              
+            }
+        });
+        
+        //take the patient to the welcome screen
+        cancelButton.setOnAction(e -> {
+        	WelcomePage home = new WelcomePage(primaryStage);
+            home.show();
+        });
+        
+        
     }
 
     private boolean validateFields(String firstName, String lastName, LocalDate birthday, String password) {
@@ -76,11 +98,11 @@ public class SignUpPage {
         return true;
     }
 
-    private void showConfirmation(String firstName) {
+    private void showConfirmation(String firstName, String username) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Sign Up Successful");
         alert.setHeaderText(null);
-        alert.setContentText("Welcome, " + firstName + "! You have successfully signed up.");
+        alert.setContentText("Welcome, " + firstName + "! You have successfully signed up.\nYour username is: "+username);
         alert.showAndWait();
         WelcomePage home = new WelcomePage(primaryStage);
         home.show();
@@ -93,4 +115,15 @@ public class SignUpPage {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    
+    private String generatePatientID(String firstName, String lastName, String formattedBirthday) {
+        
+        // Example: '2MJones080701'
+        // We'll assume here that you have access to the number of patients with the same name.
+        // For simplicity, we'll use '2' for the example.
+        String patientID = firstName.substring(0, 1) + lastName + formattedBirthday.substring(0,4);
+        return patientID;
+    }
+    
+    
 }

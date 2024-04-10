@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class PatientDashboard {
@@ -14,7 +15,6 @@ public class PatientDashboard {
     private String patientLastName;
     private int patientAge;
     private String patientBirthday;
-    User rlUser;
 
     public PatientDashboard(Stage primaryStage, User rlUser) {
         this.primaryStage = primaryStage;
@@ -27,9 +27,12 @@ public class PatientDashboard {
     public void show() {
         primaryStage.setTitle("Patient Dashboard");
         
+        // Label for the title
+        Label titleLabel = new Label("Pediatric Doctor's Office");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
-
-
+        Label dashLabel = new Label("Patient Dashboard");
+        dashLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
         // Display patient information
         Label nameLabel = new Label("Name: " + patientFirstName + " " + patientLastName);
@@ -37,29 +40,31 @@ public class PatientDashboard {
         Label birthdayLabel = new Label("Birthday: " + patientBirthday);
 
         // Buttons for various actions
-
-        // Example: Button to view contact info
         Button viewContactInfoButton = new Button("View Contact Info");
-
-        // Example: Button to update contact info
         Button updateContactInfoButton = new Button("Update Contact Info");
-
-        // Example: Button to view visit history
         Button viewVisitHistoryButton = new Button("View Visit History");
-
-        // Example: Button to send messages to staff
         Button sendMessageToStaffButton = new Button("Send Message to Staff");
-        
-        
 
-        // Layout for patient dashboard
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(nameLabel, ageLabel, birthdayLabel, viewContactInfoButton, updateContactInfoButton, viewVisitHistoryButton, sendMessageToStaffButton);
+        // Set button widths
+        viewContactInfoButton.setPrefWidth(200);
+        updateContactInfoButton.setPrefWidth(200);
+        viewVisitHistoryButton.setPrefWidth(200);
+        sendMessageToStaffButton.setPrefWidth(200);
+
+        // Horizontal layout for buttons
+        HBox buttonBox = new HBox(20);
+        buttonBox.getChildren().addAll(viewContactInfoButton, updateContactInfoButton, viewVisitHistoryButton, sendMessageToStaffButton);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        // Vertical layout for patient information and buttons
+        VBox layout = new VBox(20);
+        layout.getChildren().addAll(titleLabel, dashLabel, nameLabel, ageLabel, birthdayLabel, buttonBox);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
         primaryStage.setScene(new Scene(layout, 850, 700));
         primaryStage.show();
+
         
         //handle events below here
         

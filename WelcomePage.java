@@ -51,8 +51,6 @@ public class WelcomePage {
         Button signInButton = new Button("Sign In");
         Button signUpButton = new Button("Sign Up");
         
-        //healthcare provider label to redirect to a different login page
-        
         
         // Create an ImageView with the image
         Image image = new Image("logo.png"); 
@@ -68,6 +66,7 @@ public class WelcomePage {
         logoBox.setAlignment(Pos.CENTER);
         logoBox.setPrefWidth(400);
         
+        //healthcare provider label to redirect to a different login page
         Button HCBtn = new Button("Healthcare Provider? Sign in here");
         
 
@@ -101,7 +100,7 @@ public class WelcomePage {
                 // Perform authentication logic
                 User rlUser = authenticate(username, password);
 
-                if (rlUser != null) {
+                if (rlUser!=null) {
                     // Authentication successful, open dashboard based on role
                     openDashboard(rlUser);
                 } else {
@@ -142,7 +141,7 @@ public class WelcomePage {
         // Open dashboard based on the role of the user
         // For demonstration purposes, let's assume there is only one dashboard for all users
         // Replace "DashboardPage" with the appropriate dashboard class based on the user's role
-        PatientDashboard dashboardPage = new PatientDashboard(primaryStage, rlUser);
+    	PatientDashboard dashboardPage = new PatientDashboard(primaryStage, rlUser);
         dashboardPage.show();
     }
 
