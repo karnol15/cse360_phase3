@@ -9,15 +9,24 @@ public class ConversationHistory {
 
     public ConversationHistory(String user) {
     	conversationEntries = new ArrayList<>();
-        historyFile = new File("message" + File.separator + "history" + File.separator + user + ".txt");
-        if (!historyFile.exists()) {
-            try {
-                historyFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+    	String directoryPath = "message" + File.separator + "history";
+        String filePath = directoryPath + File.separator + user + ".txt";
+        historyFile = new File(filePath);
+        
+        try {
+            // Ensure that the directory structure exists
+            FileUtils.ensureDirectoryExists(directoryPath);
+
+            // Create the file if it doesn't exist
+            if (!historyFile.exists()) {
+                if (!historyFile.createNewFile()) {
+                    throw new IOException("Failed to create file: " + filePath);
+                }
+            } else {
+                loadHistory();
             }
-        } else {
-        	loadHistory();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

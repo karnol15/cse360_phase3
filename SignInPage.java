@@ -34,6 +34,13 @@ public class SignInPage {
         
         //
         welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 32));
+
+
+        Label quote = new Label("\"Pediatrics: Making a big difference to little people\"");
+        quote.setFont(Font.font("Arial", FontWeight.LIGHT, 24));
+        Label definition = new Label("Did you know \"paediatrics\" translates to \"healer of children\" in Greek? ");
+        definition.setFont(Font.font("Arial", FontWeight.LIGHT, 18));
+        
         
         //create a toggle group that allows the user to pick their role
         ToggleGroup loginOptions = new ToggleGroup();
@@ -42,7 +49,13 @@ public class SignInPage {
         doctor.setToggleGroup(loginOptions);
         nurse.setToggleGroup(loginOptions);
         
+        //adjust the font size of the buttons to match their corresponding label
+        doctor.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 16));
+        nurse.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 16));
+
+        
         Label staffOption = new Label("I am a :");
+        staffOption.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         
         VBox options = new VBox(10);
         options.getChildren().addAll(staffOption, doctor, nurse);
@@ -70,9 +83,15 @@ public class SignInPage {
         PasswordField passwordField = new PasswordField();
 
         Button signInButton = new Button("Sign In");
+        Button signUpButton = new Button("Sign Up");
+        Button goBackBtn = new Button("Go back");
+        
+        //allow staff to create accounts
+        Label newStaffLabel = new Label("New staff? Register with our office below!");
+        newStaffLabel.setFont(Font.font("Arial", 14));
 
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(options, usernameLabel, usernameField, passwordLabel, passwordField, signInButton);
+        layout.getChildren().addAll(options, usernameLabel, usernameField, passwordLabel, passwordField, signInButton, newStaffLabel, signUpButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
         layout.setPrefWidth(300);
@@ -82,7 +101,7 @@ public class SignInPage {
         middleLayout.setAlignment(Pos.CENTER_LEFT);
         
         VBox finalLayout = new VBox(10);
-        finalLayout.getChildren().addAll(welcomeLabel, middleLayout);
+        finalLayout.getChildren().addAll(welcomeLabel, quote, middleLayout, definition, goBackBtn);
         finalLayout.setAlignment(Pos.CENTER);
         
         
@@ -94,6 +113,17 @@ public class SignInPage {
         
         signInButton.setOnAction(new EventHandler<>() {
             public void handle(ActionEvent event) {
+            	//check that a role has been selected
+            	if(loginOptions.getSelectedToggle() == null) {
+            		showError("Error", "Please select a role and try again.");
+            		return;
+            	}
+            	
+            	//check that the fields arent empty
+            	if(usernameField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+            		showError("Error", "Please fill out all fields and try again.");
+            		return;
+            	}
             	 // Get username and password from input fields
                 String username = usernameField.getText();
                 String password = passwordField.getText();
@@ -110,6 +140,21 @@ public class SignInPage {
                     // Authentication failed, show error message
                 }
                 else {showError("Error", "Incorrect username or password. Please try again.");}
+            }
+        });
+        
+        //this changes the scene to the signUp page
+        signUpButton.setOnAction(new EventHandler<>() {
+            public void handle(ActionEvent event) {
+            	staffSignUp signUpPage = new staffSignUp(primaryStage);
+                signUpPage.show();
+            }
+        });
+        
+        goBackBtn.setOnAction(new EventHandler<>() {
+            public void handle(ActionEvent event) {
+            	WelcomePage home = new WelcomePage(primaryStage);
+                home.show();
             }
         });
         
@@ -142,7 +187,7 @@ public class SignInPage {
         DoctorDashboard dashboardPage = new DoctorDashboard(primaryStage, "john", "doe", 30, "today");
         dashboardPage.show();
     }
-
+    
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

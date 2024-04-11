@@ -40,7 +40,10 @@ public class Conversation {
                 	contentBuilder.append(contentLine);
                 	contentBuilder.append("\n");
                 } else {
-                    conversation.add(new Message(timestamp, sender, contentBuilder.toString()));
+                	if (conversation == null) {
+                        conversation = new ArrayList<>(); // Initialize conversation list if null
+                    }
+                	conversation.add(new Message(timestamp, sender, contentBuilder.toString()));
                     timestamp = null;
                     sender = null;
                     contentBuilder.setLength(0); // Clear StringBuilder
@@ -56,7 +59,11 @@ public class Conversation {
     }
 
     public void sendMessage(String sender, String content) {
-        LocalDateTime timestamp = LocalDateTime.now();
+    	if (conversation == null) {
+            conversation = new ArrayList<>(); // Initialize conversation list if null
+        }
+    	
+    	LocalDateTime timestamp = LocalDateTime.now();
         Message message = new Message(timestamp, sender, content);
         conversation.add(message);
         saveMessage(message);

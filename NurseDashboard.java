@@ -14,12 +14,11 @@ import javafx.stage.Stage;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-
+import java.time.format.DateTimeFormatter;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javafx.scene.control.ButtonType;
@@ -169,7 +168,7 @@ public class NurseDashboard {
     
     // Method to open popup for sending message to patient
     private void openSendMessagePopup() {
-	    // Create a new stage for the popup
+    	// Create a new stage for the popup
 	    Stage popupStage = new Stage();
 
 	    // Layout for popup
@@ -181,9 +180,9 @@ public class NurseDashboard {
 
         MessageSystem messageSystem = new MessageSystem(popupStage, userId);
         messageSystem.show();
-	}
+    }
 
-    // Helper method to send message to patient
+    
 
     // Helper method to show error messages
     private void showError(String title, String message) {
@@ -193,6 +192,7 @@ public class NurseDashboard {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    
     private void takeVitals() {
         Stage vitalsStage = new Stage();
         vitalsStage.setTitle("Take Vitals");

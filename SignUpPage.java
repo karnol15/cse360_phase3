@@ -1,3 +1,4 @@
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -7,18 +8,18 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.scene.control.RadioButton;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class SignUpPage {
     private Stage primaryStage;
-    ToggleGroup occupation;
 
     public SignUpPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -26,6 +27,13 @@ public class SignUpPage {
 
     public void show() {
         primaryStage.setTitle("Sign Up");
+        
+        Label welcomeLabel= new Label("Welcome! Thank you for picking our Pediatric Office.");
+        
+        Label welcomeLabel2 = new Label("\n We look forward to providing you with the utmost care and attention.");
+        
+        welcomeLabel.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 32));
+        welcomeLabel2.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 24));
 
         Label firstNameLabel = new Label("First Name:");
         TextField firstNameField = new TextField();
@@ -35,42 +43,61 @@ public class SignUpPage {
 
         Label birthdayLabel = new Label("Birthday:");
         DatePicker birthdayPicker = new DatePicker();
+        
+        // Create labels and text fields for vitals input
+        Label addressLabel = new Label("Address: ");
+        TextField addressField = new TextField();
+        Label phoneNumberLabel = new Label("Phone Number: ");
+        TextField phoneNumberField = new TextField();
+        Label emailLabel = new Label("Email: ");
+        TextField emailField = new TextField();
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
-        
-        RadioButton doctor = new RadioButton("Doctor");
-        RadioButton nurse = new RadioButton("Nurse");
-        RadioButton patient = new RadioButton("Patient");
-        
-        occupation = new ToggleGroup();
-        doctor.setToggleGroup(occupation);
-        nurse.setToggleGroup(occupation);
-        patient.setToggleGroup(occupation);
-       
-       
 
-        Button signUpButton = new Button("Sign Up");       
+        Button signUpButton = new Button("Sign Up");
+        
 
         Button cancelButton = new Button("Cancel");
-        
         
 
         HBox buttonLayout = new HBox(10);
         buttonLayout.getChildren().addAll(signUpButton, cancelButton);
         buttonLayout.setAlignment(Pos.CENTER);
+
         
-        HBox radioButtons = new HBox(10);
-        radioButtons.getChildren().addAll(doctor, nurse, patient);
-        radioButtons.setAlignment(Pos.CENTER);
+        //make the textareas wider
+        firstNameField.setPrefWidth(220);
+        lastNameField.setPrefWidth(220);
+        emailField.setPrefWidth(220);
+        birthdayPicker.setPrefWidth(220);
+        addressField.setPrefWidth(220);
+        phoneNumberField.setPrefWidth(220);
+        passwordField.setPrefWidth(220);
+        
+        // Create grid layout for the vitals input fields
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.addRow(0, firstNameLabel, firstNameField);
+        gridPane.addRow(1, lastNameLabel, lastNameField);
+        gridPane.addRow(2, emailLabel, emailField);
+        gridPane.addRow(3, birthdayLabel, birthdayPicker);
+        gridPane.addRow(4, addressLabel, addressField);
+        gridPane.addRow(5, phoneNumberLabel, phoneNumberField);
+        gridPane.addRow(6, passwordLabel, passwordField);
+        //set the alignment
+        GridPane.setHalignment(buttonLayout, HPos.CENTER);
+        GridPane.setColumnSpan(buttonLayout, 2);
+        gridPane.addRow(7,buttonLayout);
 
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(firstNameLabel, firstNameField, lastNameLabel, lastNameField,
-                birthdayLabel, birthdayPicker, passwordLabel, passwordField, radioButtons, buttonLayout);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
+        VBox finalLayout = new VBox(10);
+        finalLayout.getChildren().addAll(welcomeLabel, welcomeLabel2, gridPane);
+        finalLayout.setAlignment(Pos.CENTER);
 
-        primaryStage.setScene(new Scene(layout, 500, 450));
+        primaryStage.setScene(new Scene(finalLayout, 850, 700));
         primaryStage.show();
         
         //handle all events below here
@@ -79,23 +106,29 @@ public class SignUpPage {
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
             LocalDate birthday = birthdayPicker.getValue();
+            String address = addressField.getText();
+            String phoneNumber = phoneNumberField.getText();
+            
+            long parsedPhoneNumber = 0;
+            try {
+                parsedPhoneNumber = Long.parseLong(phoneNumber);
+            } catch (NumberFormatException ex) {
+                showError("Error", "Invalid phone number format.");
+                return;
+            }
+            
+            String email = emailField.getText();
             String password = passwordField.getText();
-            int type = 0;
 
-            if (validateFields(firstName, lastName, birthday, password)) {
-                // Perform sign-up logic here (e.g., save user to database)
-                // For simplicity, we'll just display a confirmation message
-            	if (occupation.getSelectedToggle() == patient) {type = 0;}
-            	else if(occupation.getSelectedToggle() == nurse) {type = 1;}
-            	else if(occupation.getSelectedToggle() == doctor) {type = 2;}
-            	Main.newUser(firstName, lastName, birthday, password, type);
+            if (validateFields(firstName, lastName, birthday, address, phoneNumber, email, password)) {
             	
-            	// Generate patient ID
+            	// Create a new patient
+                Patient patient = Main.newPatient(firstName, lastName, birthday, password, address, parsedPhoneNumber, email);
+                
+                // Generate patient ID
                 String formattedBirthday = DateTimeFormatter.ofPattern("MMddyy").format(birthday);
                 String username = generatePatientID(firstName, lastName, formattedBirthday);
             	showConfirmation(firstName, username);
-                
-              
             }
         });
         
@@ -108,14 +141,16 @@ public class SignUpPage {
         
     }
 
-    private boolean validateFields(String firstName, String lastName, LocalDate birthday, String password) {
-        if (firstName.isEmpty() || lastName.isEmpty() || birthday == null || password.isEmpty() || occupation.getSelectedToggle() == null) {
-            showError("Error", "Please fill out all fields.");
-            return false;
-        }
-        // Additional validation logic can be added here if needed
-        return true;
-    }
+    private boolean validateFields(String firstName, String lastName, LocalDate birthday,
+        String address, String phoneNumber, String email, String password) {
+		if (firstName.isEmpty() || lastName.isEmpty() || birthday == null || address.isEmpty() ||
+					phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty()) {
+			showError("Error", "Please fill out all fields.");
+			return false;
+		}
+		// Additional validation logic can be added here if needed
+		return true;
+	}
 
     private void showConfirmation(String firstName, String username) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

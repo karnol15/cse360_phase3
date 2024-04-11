@@ -36,7 +36,13 @@ public class WelcomePage {
         //
         title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         
+        
+        
         //login
+        
+        //Login label
+        Label loginLabel = new Label("Patient Login");
+        loginLabel.setFont(Font.font("Arial", FontWeight.BOLD, 26));
         Label usernameLabel = new Label("Username:");
         TextField usernameField = new TextField();
 
@@ -44,8 +50,8 @@ public class WelcomePage {
         PasswordField passwordField = new PasswordField();
         
         VBox fieldsBox = new VBox(10);
-        fieldsBox.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField);
-        fieldsBox.setAlignment(Pos.CENTER_LEFT);
+        fieldsBox.getChildren().addAll(loginLabel, usernameLabel, usernameField, passwordLabel, passwordField);
+        fieldsBox.setAlignment(Pos.TOP_LEFT);
         
         
         Button signInButton = new Button("Sign In");
@@ -66,12 +72,13 @@ public class WelcomePage {
         logoBox.setAlignment(Pos.CENTER);
         logoBox.setPrefWidth(400);
         
-        //healthcare provider label to redirect to a different login page
-        Button HCBtn = new Button("Healthcare Provider? Sign in here");
+        Label newPatientLabel = new Label("New to our office? Create an account below!");
+        newPatientLabel.setFont(Font.font("Arial", 16));
+
         
 
         VBox signInBox = new VBox(10);
-        signInBox.getChildren().addAll(fieldsBox, signInButton, signUpButton);
+        signInBox.getChildren().addAll(fieldsBox, signInButton, newPatientLabel, signUpButton);
         signInBox.setAlignment(Pos.CENTER);
         signInBox.setPadding(new Insets(20));
         signInBox.setPrefWidth(400);
@@ -81,6 +88,12 @@ public class WelcomePage {
         layout.setAlignment(Pos.CENTER);
         
         VBox finalLayout = new VBox(10);
+        
+
+        //healthcare provider label to redirect to a different login page
+        Button HCBtn = new Button("Healthcare Provider? Sign in here");
+        HCBtn.setStyle("-fx-background-color: lightblue; -fx-font-size: 12px;-fx-min-width: 100px; -fx-min-height: 75px;");
+        
         
         finalLayout.getChildren().addAll(title, layout, HCBtn);
         finalLayout.setAlignment(Pos.CENTER);
@@ -98,7 +111,7 @@ public class WelcomePage {
                 String password = passwordField.getText();
 
                 // Perform authentication logic
-                User rlUser = authenticate(username, password);
+                Patient rlUser = authenticate(username, password);
 
                 if (rlUser!=null) {
                     // Authentication successful, open dashboard based on role
@@ -128,16 +141,16 @@ public class WelcomePage {
         
     }
     
-    private User authenticate(String username, String password) {
-        if (Main.userMap.containsKey(username)) {
-        	if (password.hashCode() == Main.userMap.get(username).getHash()) {
-        		return Main.userMap.get(username);
+    private Patient authenticate(String username, String password) {
+        if (Main.patientMap.containsKey(username)) {
+        	if (password.hashCode() == Main.patientMap.get(username).getHash()) {
+        		return Main.patientMap.get(username);
         	}
         }
         return null;
     }
 
-    private void openDashboard(User rlUser) {
+    private void openDashboard(Patient rlUser) {
         // Open dashboard based on the role of the user
         // For demonstration purposes, let's assume there is only one dashboard for all users
         // Replace "DashboardPage" with the appropriate dashboard class based on the user's role

@@ -2,22 +2,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
+import java.time.format.DateTimeFormatter;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.DatePicker;
-import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javafx.scene.control.ButtonType;
@@ -45,23 +46,54 @@ public class DoctorDashboard {
     public void show() {
         primaryStage.setTitle("Doctor Dashboard");
 
+        // Create an ImageView with the image
+        Image image = new Image("doctorDashIMG.jpg"); 
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(500);
+        
+        // Set preserve ratio to true so that image won't stretch disproportionately
+        imageView.setPreserveRatio(true);
+
+        // Create a VBox and add the ImageView to it
+        HBox logoBox = new HBox();
+        logoBox.getChildren().add(imageView);
+        logoBox.setAlignment(Pos.CENTER);
+
+        // Set preferred width for the VBox
+        logoBox.setPrefWidth(750);
+        
+        Label dashLabel = new Label("Doctor Dashboard");
+        dashLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        
         // Display patient information
-        Label nameLabel = new Label("Name: " + patientFirstName + " " + patientLastName);
+        Label welcomeLabel = new Label("Welcome back, Doctor");
+        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        
+        // Display patient information
+        Label actionLabel = new Label("What would you like to do?");
+        actionLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        
        
 
         // Buttons for various actions
         Button viewMedicalHistoryButton = new Button("View Medical History");
         Button makeAppointmentButton = new Button("Make Appointment");
         Button sendMessageToPatientButton = new Button("Send Message to Patient");
-        Button prescribeMedicineButton = new Button("Prescribe medicine");
+        Button prescribeMedicineButton = new Button("Prescribe Medicine");
         Button performPhysical = new Button("Perform Physical");
+        
+        Button logOutButton = new Button("Logout");
 
         
 
 
         // Layout for patient dashboard
+        
+        HBox buttonsLayout = new HBox(10);
+        buttonsLayout.getChildren().addAll(viewMedicalHistoryButton, prescribeMedicineButton,performPhysical, sendMessageToPatientButton);
+        buttonsLayout.setAlignment(Pos.CENTER);
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(nameLabel, viewMedicalHistoryButton, makeAppointmentButton, sendMessageToPatientButton);
+        layout.getChildren().addAll(dashLabel, welcomeLabel, actionLabel, buttonsLayout, logOutButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
@@ -72,13 +104,45 @@ public class DoctorDashboard {
         viewMedicalHistoryButton.setOnAction(e -> viewMedicalHistory());
         makeAppointmentButton.setOnAction(e -> makeAppointment());
         sendMessageToPatientButton.setOnAction(e -> openSendMessagePopup());
+        performPhysical.setOnAction(e->inputPhysicalData());
+        prescribeMedicineButton.setOnAction(e->prescribeMedication());
+        
+        logOutButton.setOnAction(new EventHandler<>() {
+            public void handle(ActionEvent event) {
+            	WelcomePage home = new WelcomePage(primaryStage);
+                home.show();
+            }
+        });
 
 
     }
 
     private void viewMedicalHistory() {
         // Assuming the medical history files are stored in a specific directory
-        String medicalHistoryDirectory = "medical_history/";
+        
+    	// Create labels and text fields for medication details
+    	Label patientUsername = new Label("Enter the Patients username whose history you wish to view:");
+        TextField usernameField = new TextField();
+        HBox fieldBox = new HBox(usernameField);
+        fieldBox.setPrefWidth(150);
+        fieldBox.setAlignment(Pos.CENTER);
+    
+        // Create a button to save the entered findings
+        Button confirmButton = new Button("Retrive Medical Histrory");
+        
+       
+       
+        
+        VBox confirmBox = new VBox(10);
+        confirmBox.getChildren().addAll(patientUsername, fieldBox, confirmButton);
+        confirmBox.setAlignment(Pos.CENTER);
+        // Create a new stage for recording findings
+        Stage findingsStage = new Stage();
+        findingsStage.setTitle("Enter Patients Username");
+        findingsStage.setScene(new Scene(confirmBox, 400, 250));
+        findingsStage.show();
+        /*
+    	String medicalHistoryDirectory = "medical_history/";
         
         // Constructing the file path based on the patient's username
         String username = "patient_username"; // You should replace this with the actual patient's username
@@ -114,7 +178,7 @@ public class DoctorDashboard {
             alert.setHeaderText("Error viewing medical history");
             alert.setContentText("Could not find medical history for the patient.");
             alert.showAndWait();
-        }
+        }*/
     }
 
     private void makeAppointment() {
@@ -165,21 +229,21 @@ public class DoctorDashboard {
         alert.showAndWait();
     }*/
 
-    // Method to open popup for sending message to patient
-	private void openSendMessagePopup() {
-	    // Create a new stage for the popup
-	    Stage popupStage = new Stage();
+ // Method to open popup for sending message to patient
+ 	private void openSendMessagePopup() {
+ 	    // Create a new stage for the popup
+ 	    Stage popupStage = new Stage();
 
-	    // Layout for popup
-	    VBox popupLayout = new VBox(10);
-	    popupStage.setScene(new Scene(popupLayout, 400, 200));
-	    popupStage.show();
+ 	    // Layout for popup
+ 	    VBox popupLayout = new VBox(10);
+ 	    popupStage.setScene(new Scene(popupLayout, 400, 200));
+ 	    popupStage.show();
 
-        String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday.substring(0,4);
+         String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday.substring(0,4);
 
-        MessageSystem messageSystem = new MessageSystem(popupStage, userId);
-        messageSystem.show();
-	}
+         MessageSystem messageSystem = new MessageSystem(popupStage, userId);
+         messageSystem.show();
+ 	}
 	
 	
 	// Helper method to send message to patient
@@ -198,6 +262,9 @@ public class DoctorDashboard {
 	    }
 
     private void inputPhysicalData() {
+    	// Create labels and text fields for medication details
+    	Label patientUsername = new Label("Enter Patients username:");
+        TextField usernameField = new TextField();
         Label findingsLabel = new Label("New Findings:");
         TextArea findingsTextArea = new TextArea();
         findingsTextArea.setWrapText(true);
@@ -221,8 +288,11 @@ public class DoctorDashboard {
         });
     
         // Create a layout to arrange the input components
+        HBox patientBox = new HBox(10);
+        patientBox.getChildren().addAll(patientUsername, usernameField);
+        patientBox.setAlignment(Pos.CENTER_LEFT);
         VBox inputLayout = new VBox(10);
-        inputLayout.getChildren().addAll(findingsLabel, findingsTextArea, saveButton);
+        inputLayout.getChildren().addAll(patientBox,findingsLabel, findingsTextArea, saveButton);
         inputLayout.setAlignment(Pos.CENTER);
         inputLayout.setPadding(new Insets(20));
     
@@ -254,6 +324,9 @@ public class DoctorDashboard {
 
     private void prescribeMedication() {
         // Create labels and text fields for medication details
+    	Label patientUsername = new Label("Enter Patients username:");
+        TextField usernameField = new TextField();
+
         Label medicationNameLabel = new Label("Medication Name:");
         TextField medicationNameField = new TextField();
     
@@ -287,40 +360,34 @@ public class DoctorDashboard {
         });
     
         // Create a layout to arrange the input components
-        VBox inputLayout = new VBox(10);
-        inputLayout.getChildren().addAll(medicationNameLabel, medicationNameField, dosageLabel, dosageField,
-                frequencyLabel, frequencyField, instructionsLabel, instructionsField, prescribeButton);
-        inputLayout.setAlignment(Pos.CENTER);
-        inputLayout.setPadding(new Insets(20));
+        
+        // Create grid layout for the vitals input fields
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.addRow(0, patientUsername, usernameField);
+        gridPane.addRow(1, medicationNameLabel, medicationNameField);
+        gridPane.addRow(2, dosageLabel, dosageField);
+        gridPane.addRow(3, frequencyLabel, frequencyField);
+        gridPane.addRow(4, instructionsLabel, instructionsField);
+        
+        //set the alignment
+        GridPane.setHalignment(prescribeButton, HPos.CENTER);
+        GridPane.setColumnSpan(prescribeButton, 2);
+        gridPane.addRow(5,prescribeButton);
+        
     
         // Create a new stage for prescribing medication
         Stage prescribeMedicationStage = new Stage();
         prescribeMedicationStage.setTitle("Prescribe Medication");
-        prescribeMedicationStage.setScene(new Scene(inputLayout));
+        prescribeMedicationStage.setScene(new Scene(gridPane));
         prescribeMedicationStage.show();
     }
 
     
 
-    private void viewHealthHistory() {
-        // Retrieve the patient's health history from the database or data structure
-        String patientUsername = "patient_username"; // Replace with actual patient's username
-        String healthHistory = retrieveHealthHistory(patientUsername);
     
-        // Display the health history in an alert dialog
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Health History");
-        alert.setHeaderText("Health History for " + patientFirstName + " " + patientLastName);
-        alert.setContentText(healthHistory);
-        alert.showAndWait();
-    }
-    
-    // Method to retrieve health history from the database or data structure
-    private String retrieveHealthHistory(String patientUsername) {
-        // Placeholder method to simulate retrieving health history
-        // Replace this with actual logic to retrieve health history from files .txt
-        // For demonstration purposes, returning dummy health history
-        return "Patient's health history goes here...";
-    }
     
 }
