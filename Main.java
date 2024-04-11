@@ -1,4 +1,7 @@
 
+import java.util.HashMap;
+
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,15 +10,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 	
-	
-	//creating two hashmaps to separate patients and staff
 	public static HashMap<String, Patient> patientMap = new HashMap<>(); // Store Patient objects
     private static final String PATIENT_FILE_NAME = "userHash.txt"; // New file name
     
@@ -45,7 +45,6 @@ public class Main extends Application {
         	
         	} catch (Exception e1) {System.out.println("didn't work");}
 		
-		//initialize staff file
 		try {
         	File f = new File(STAFF_FILE_NAME);
         	if (!f.exists()) {userMap = new HashMap<String, User>(); return;}
@@ -67,14 +66,12 @@ public class Main extends Application {
 
 	
 	@Override
-	//we simply start with the Welcome Page
     public void start(Stage primaryStage) {
         // Create and display the welcome page
         WelcomePage welcomePage = new WelcomePage(primaryStage);
         welcomePage.show();
     }
 	
-	//when the program is closed, want to update the hashMap files accordingly
 	public void stop() {
 		
 		File patientInfo = new File(PATIENT_FILE_NAME);
@@ -122,8 +119,6 @@ public class Main extends Application {
         return newPatient;
     }
     
-    
-    //create a new staff user and add to the user map
 	public static void newUser(String fName, String lName, LocalDate bday, String password, int type) {
 			
 			//logic to form the userName

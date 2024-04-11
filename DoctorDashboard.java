@@ -4,54 +4,48 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.scene.control.DatePicker;
+import javafx.util.Callback;
+import java.time.LocalDate;
+import java.util.Optional;
+
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.*;
 
 
 public class DoctorDashboard {
     private Stage primaryStage;
-    private String doctorFirstName;
-    private String doctorLastName;
-    
-    private String doctorBirthday;
-    private String userId;
-    MessageSystem messageSystem;
+    private String patientFirstName;
+    private String patientLastName;
+    private int patientAge;
+    private String patientBirthday;
 
-    public DoctorDashboard(Stage primaryStage, User rlUser) {
+    public DoctorDashboard(Stage primaryStage, String firstName, String lastName, int age, String birthday) {
         this.primaryStage = primaryStage;
-        this.doctorFirstName = rlUser.getFName();
-        this.doctorLastName = rlUser.getLName();
-        
-        LocalDate birthday = rlUser.getBirthday();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
-        this.doctorBirthday = birthday.format(formatter);	
-        
-        // Initialize MessageSystem
-        userId = doctorFirstName.substring(0, 1) + doctorLastName + doctorBirthday;
-        messageSystem = new MessageSystem(userId);
+        this.patientFirstName = firstName;
+        this.patientLastName = lastName;
+        this.patientAge = age;
+        this.patientBirthday = birthday;
     }
 
     public void show() {
-    	
-    	//create all the UI components first
         primaryStage.setTitle("Doctor Dashboard");
 
         // Create an ImageView with the image
@@ -71,7 +65,7 @@ public class DoctorDashboard {
         logoBox.setPrefWidth(750);
         
         Label dashLabel = new Label("Doctor Dashboard");
-        dashLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+        dashLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
         // Display patient information
         Label welcomeLabel = new Label("Welcome back, Doctor");
@@ -125,8 +119,6 @@ public class DoctorDashboard {
 
     }
 
-    
-    //this is called when the button is clicked
     private void viewMedicalHistory() {
         // Create labels and text fields for medication details
         Label patientUsername = new Label("Enter the Patient's username whose history you wish to view:");
@@ -135,7 +127,7 @@ public class DoctorDashboard {
         fieldBox.setPrefWidth(250);
         fieldBox.setAlignment(Pos.CENTER);
 
-        // Create a button to search for the users medical history
+        // Create a button to save the entered findings
         Button confirmButton = new Button("Retrieve Medical History");
 
         VBox confirmBox = new VBox(10);
@@ -181,14 +173,13 @@ public class DoctorDashboard {
             TextArea prescriptionsTextArea = new TextArea();
             TextArea immunizationsTextArea = new TextArea();
             TextArea recommendationsTextArea = new TextArea();
-            
             // Set  height for each text area
-            healthIssuesTextArea.setPrefHeight(80); 
+            healthIssuesTextArea.setPrefHeight(80); // Adjust the height as needed
             prescriptionsTextArea.setPrefHeight(80);
             immunizationsTextArea.setPrefHeight(80);
             recommendationsTextArea.setPrefHeight(80);
 
-            // Read the medical history from the file and fill in the text areas
+            // Read the medical history from the file and populate the text areas
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
@@ -221,7 +212,6 @@ public class DoctorDashboard {
             gridPane.add(saveButton, 1, 4);
 
             // Action handler for the save button
-            // when the doctor saves, the existing file is overwritten
             saveButton.setOnAction(event -> {
                 try {
                     FileWriter fileWriter = new FileWriter(file);
@@ -259,6 +249,14 @@ public class DoctorDashboard {
     }
 
 
+    /* Helper method to show error messages
+    private void showError(String title, String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }*/
 
     // Method to open popup for sending message to patient
  	
@@ -278,12 +276,11 @@ public class DoctorDashboard {
         popupStage.setScene(new Scene(popupLayout, 400, 200));
         popupStage.show();
 
-        
-        //need the doctor to input the patients username
         viewMessagesButton.setOnAction(e -> {
             String patientUsername = usernameField.getText().trim();
             if (!patientUsername.isEmpty()) {
                 // Initialize MessageSystem with patient's username
+                MessageSystem messageSystem = new MessageSystem(patientUsername);
                 messageSystem.replyToPatient(patientUsername);
             } else {
                 showError("Error", "Please enter the patient's username.");
@@ -291,7 +288,6 @@ public class DoctorDashboard {
         });
     }
 	
- // Helper method to show alert messages
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -310,7 +306,6 @@ public class DoctorDashboard {
 	    alert.showAndWait();
 	    }
 
-	
     private void inputPhysicalData() {
     	// Create labels and text fields for medication details
     	Label patientUsername = new Label("Enter Patients username:");
@@ -362,9 +357,16 @@ public class DoctorDashboard {
         alert.showAndWait();
     }
     
+    // Helper method to display error message
+    /*private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }*/
 
-    
-    //allow the doctor to prescribe the patient medicine
+
     private void prescribeMedication() {
         // Create labels and text fields for medication details
     	Label patientUsername = new Label("Enter Patients username:");
@@ -381,6 +383,10 @@ public class DoctorDashboard {
     
         Label instructionsLabel = new Label("Instructions:");
         TextField instructionsField = new TextField();
+        
+        Label datePick = new Label("Appt. Date:");
+        DatePicker dater = new DatePicker();
+        
     
         // Create a button to prescribe medication
         Button prescribeButton = new Button("Prescribe Medication");
@@ -390,11 +396,44 @@ public class DoctorDashboard {
             String dosage = dosageField.getText();
             String frequency = frequencyField.getText();
             String instructions = instructionsField.getText();
+            String username = usernameField.getText().trim();
     
             // Validate the entered data
-            if (!medicationName.isEmpty() && !dosage.isEmpty() && !frequency.isEmpty()&& !instructions.isEmpty()) {
+            if (!username.isEmpty() && !medicationName.isEmpty() && !dosage.isEmpty() && !frequency.isEmpty() && dater.getValue() != null) {
                 // Perform logic to save the prescribed medication (e.g., save to database)
                 // Display a confirmation message
+            	LocalDate date = dater.getValue();
+            	
+            	
+            	String medicalHistoryDirectory = "medical_history/";
+                String medicalHistoryFilePath = medicalHistoryDirectory + username + "_" + date + "_prescriptions.txt";
+                
+                
+                try {
+        	        File file = new File(medicalHistoryFilePath);
+        	        if (!file.exists()) {
+        	            // If the file does not exist, create it
+        	            if (!file.getParentFile().exists()) {
+        	                file.getParentFile().mkdirs(); // Create parent directories if they don't exist
+        	            }
+        	            file.createNewFile(); // Create the file
+        	        }
+        	        
+        	        FileWriter fileWriter = new FileWriter(file);
+                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                    
+                    bufferedWriter.write(medicationName + "\n");
+                    bufferedWriter.write(dosage + "\n");
+                    bufferedWriter.write(frequency + "\n");
+                    bufferedWriter.write(instructions + "\n");
+
+                    bufferedWriter.close();
+                    
+                    
+        	  
+                } catch (IOException e3) {
+                	showError("Error", "Something went wrong!");
+                }
                 showConfirmation("Medication Prescribed", "Medication has been successfully prescribed.");
             } else {
                 // Display an error message if any essential field is empty
@@ -415,11 +454,12 @@ public class DoctorDashboard {
         gridPane.addRow(2, dosageLabel, dosageField);
         gridPane.addRow(3, frequencyLabel, frequencyField);
         gridPane.addRow(4, instructionsLabel, instructionsField);
+        gridPane.addRow(5,  datePick, dater);
         
         //set the alignment
         GridPane.setHalignment(prescribeButton, HPos.CENTER);
         GridPane.setColumnSpan(prescribeButton, 2);
-        gridPane.addRow(5,prescribeButton);
+        gridPane.addRow(6,prescribeButton);
         
     
         // Create a new stage for prescribing medication
