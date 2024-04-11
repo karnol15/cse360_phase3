@@ -125,10 +125,10 @@ public class MessageSystem extends Application {
 	            
 	            // Display messages in the correct order
 	            for (String message : messages) {
-	                String[] parts = message.split(": ", 2);
-	                if (parts.length == 2) {
-	                    String sender = parts[0];
-	                    String messageContent = parts[1];
+	                String[] parts = message.split(": ", 3);
+	                if (parts.length == 3) {
+	                    String sender = parts[1];
+	                    String messageContent = parts[2];
 	                    conversationArea.appendText("From: " + sender + "\nMessage: " + messageContent + "\n\n");
 	                }
 	            }
