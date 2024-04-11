@@ -235,7 +235,7 @@ public class DoctorDashboard {
  	    Stage popupStage = new Stage();
 
  	    // Layout for popup
- 	    VBox popupLayout = new VBox(10);
+ 	    BorderPane popupLayout = new BorderPane();
  	    popupStage.setScene(new Scene(popupLayout, 400, 200));
  	    popupStage.show();
 
