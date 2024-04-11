@@ -84,7 +84,7 @@ public class MessageSystem extends Application {
 
   private void viewConversation(Stage primaryStage, String receiver, String pendingMessage, boolean isSending) {
 	    try {
-	        String folderPath = "Messages/" + receiver;
+	        String folderPath = "Messages/" + userId;
 	        File folder = new File(folderPath);
 	        FileUtils.ensureDirectoryExists(folderPath);
 	        File[] files = folder.listFiles();

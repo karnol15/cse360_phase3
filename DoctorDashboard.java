@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -30,13 +32,21 @@ public class DoctorDashboard {
     private String doctorLastName;
     
     private String doctorBirthday;
+    private String userId;
+    MessageSystem messageSystem;
 
     public DoctorDashboard(Stage primaryStage, User rlUser) {
         this.primaryStage = primaryStage;
         this.doctorFirstName = rlUser.getFName();
-        this.doctorLastName = rlUser.getFName();
+        this.doctorLastName = rlUser.getLName();
         
-        this.doctorBirthday = rlUser.getbDay();
+        LocalDate birthday = rlUser.getBirthday();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+        this.doctorBirthday = birthday.format(formatter);	
+        
+        // Initialize MessageSystem
+        userId = doctorFirstName.substring(0, 1) + doctorLastName + doctorBirthday;
+        messageSystem = new MessageSystem(userId);
     }
 
     public void show() {
@@ -274,7 +284,6 @@ public class DoctorDashboard {
             String patientUsername = usernameField.getText().trim();
             if (!patientUsername.isEmpty()) {
                 // Initialize MessageSystem with patient's username
-                MessageSystem messageSystem = new MessageSystem(patientUsername);
                 messageSystem.replyToPatient(patientUsername);
             } else {
                 showError("Error", "Please enter the patient's username.");
