@@ -29,6 +29,7 @@ public class MessageSystem {
     public void show() {
         // Left pane for conversation choices
         ListView<String> conversationList = new ListView<>();
+        participant2 = userId;
         List<ConversationEntry> conversationEntries = conversationHistory.getConversationEntries();
         for (ConversationEntry conversationEntry : conversationEntries) {
             List<String> participants = conversationEntry.getParticipants();
@@ -40,30 +41,48 @@ public class MessageSystem {
                 }
             }
         }
-        conversationList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                // Load conversation based on selected item
-            	participant2 = newVal;
-                loadConversation(newVal);
-            }
-        });
-
+        
         // Right pane for conversation history and input
         VBox conversationPane = new VBox(10);
-        conversationPane.setPadding(new Insets(10));
-
+        
         // Text area to display conversation history
         TextArea conversationHistoryTextArea = new TextArea();
-        conversationHistoryTextArea.setEditable(false);
-
+        
         // Text field for typing new messages
         TextField messageField = new TextField();
         messageField.setPromptText("Type your message here");
 
         // Button to send messages
         Button sendButton = new Button("Send");
+        
+        // Layout for conversation history, text field, and send button
+        VBox messageLayout = new VBox(10);
+        messageLayout.getChildren().addAll(conversationHistoryTextArea, messageField, sendButton);
+
+        // Combine left and right panes
+        BorderPane root = new BorderPane();
+        root.setLeft(conversationList);
+        root.setCenter(messageLayout);
+        
+        loadConversation(participant2, messageLayout, conversationHistoryTextArea);
+        
+        conversationList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                // Load conversation based on selected item
+            	participant2 = newVal;
+                loadConversation(newVal, messageLayout, conversationHistoryTextArea);
+            }
+        });
+
+        
+        conversationPane.setPadding(new Insets(10));
+
+        conversationHistoryTextArea.setEditable(false);
+
         sendButton.setOnAction(e -> {
             String message = messageField.getText().trim();
+            
+            System.out.println(message);
             if (!message.isEmpty()) {
                 // Append message to conversation history
                 appendMessage(conversationHistoryTextArea, userId + ": " + message, true);
@@ -76,19 +95,9 @@ public class MessageSystem {
                 conversationHistory.addConversationEntry(conversationEntry);
                 
                 conversation.sendMessage(userId, message);
-                
                 messageField.clear();
             }
         });
-
-        // Layout for conversation history, text field, and send button
-        VBox messageLayout = new VBox(10);
-        messageLayout.getChildren().addAll(conversationHistoryTextArea, messageField, sendButton);
-
-        // Combine left and right panes
-        BorderPane root = new BorderPane();
-        root.setLeft(conversationList);
-        root.setCenter(messageLayout);
 
         primaryStage.setScene(new Scene(root, 850, 700));
         primaryStage.show();
@@ -97,10 +106,12 @@ public class MessageSystem {
     private void appendMessage(TextArea conversationHistoryTextArea, String message, boolean isSentByUser) {
         String backgroundColor = isSentByUser ? "-fx-control-inner-background: lightblue;" : "";
         conversationHistoryTextArea.appendText(message + "\n");
-        conversationHistoryTextArea.setStyle(backgroundColor);
+
+        // Apply inline CSS styling for the last message appended
+        conversationHistoryTextArea.setStyle(conversationHistoryTextArea.getStyle() + backgroundColor);
     }
 
-    private void loadConversation(String participant2) {
+    private void loadConversation(String participant2, VBox messageLayout, TextArea conversationHistoryTextArea) {
         try {
         	int comparison = participant2.compareTo(userId);
             if (comparison < 0) {
@@ -111,17 +122,15 @@ public class MessageSystem {
             List<Message> messages = conversation.getConversation();
 
             // Display the loaded conversation in the conversation history text area
-            TextArea conversationHistoryTextArea = new TextArea();
             conversationHistoryTextArea.setEditable(false);
 
             for (Message message : messages) {
-                String formattedMessage = message.getSender() + ": " + message.getContent();
+                String formattedMessage = (message.getSender() + ": " + message.getContent()).trim();
                 appendMessage(conversationHistoryTextArea, formattedMessage, message.getSender().equals(userId));
             }
 
             // Update the conversation history text area
             BorderPane root = (BorderPane) primaryStage.getScene().getRoot();
-            VBox messageLayout = (VBox) root.getCenter();
             messageLayout.getChildren().set(0, conversationHistoryTextArea);
         } catch (FileNotFoundException e) {
             // Handle conversation not found

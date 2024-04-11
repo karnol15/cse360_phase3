@@ -16,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import java.time.format.DateTimeFormatter;
 import javafx.scene.control.DatePicker;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import java.time.LocalDate;
@@ -168,11 +169,11 @@ public class NurseDashboard {
     
     // Method to open popup for sending message to patient
     private void openSendMessagePopup() {
-    	// Create a new stage for the popup
+	    // Create a new stage for the popup
 	    Stage popupStage = new Stage();
 
 	    // Layout for popup
-	    VBox popupLayout = new VBox(10);
+	    BorderPane popupLayout = new BorderPane();
 	    popupStage.setScene(new Scene(popupLayout, 400, 200));
 	    popupStage.show();
 
@@ -180,7 +181,7 @@ public class NurseDashboard {
 
         MessageSystem messageSystem = new MessageSystem(popupStage, userId);
         messageSystem.show();
-    }
+	}
 
     
 

@@ -31,10 +31,13 @@ public class Conversation {
             
             while ((line = reader.readLine()) != null) {
                 if (timestamp == null) {
+                	if (line.isEmpty()) {
+                		break;
+                	}
                     timestamp = LocalDateTime.parse(line);
                 } else if (sender == null) {
                     sender = line;
-                } else if (line.charAt(0) == '@') {
+                } else if (!line.isEmpty() && line.charAt(0) == '@') {
                 //Extracting information based on the first character
                 	String contentLine = line.substring(1); // Remove type indicator
                 	contentBuilder.append(contentLine);
@@ -85,12 +88,10 @@ public class Conversation {
                 // Write content lines starting with "@"
                 String[] contentLines = message.getContent().split("\n");
                 for (int i = 0; i < contentLines.length; i++) {
-                	if (i == contentLines.length - 1) {
-                        writer.write(contentLines[i]); // Last line without "@"
-                    } else {
-                        writer.write("@" + contentLines[i]);
-                    }
+                	writer.write("@" + contentLines[i]);
                 }
+                writer.newLine();
+                writer.newLine();
             }
         } catch (IOException e) {
             e.printStackTrace();
