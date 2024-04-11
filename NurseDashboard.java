@@ -200,6 +200,10 @@ public class NurseDashboard {
         // Create labels and text fields for vitals input
         Label patientLabel = new Label("Enter patients username:");
         TextField patientUsernameField = new TextField();
+        
+        Label ageLabel = new Label("Enter patients age:");
+        TextField ageField = new TextField();
+        
         Label weightLabel = new Label("Weight (kg):");
         TextField weightField = new TextField();
 
@@ -218,14 +222,23 @@ public class NurseDashboard {
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
             // Validate input data
+        	double age = Double.parseDouble(ageField.getText());
+        	
+        	if (age > 12) {
             double weight = Double.parseDouble(weightField.getText());
             double height = Double.parseDouble(heightField.getText());
             double temperature = Double.parseDouble(temperatureField.getText());
             String bloodPressure = bloodPressureField.getText();
             double oxygenLevel = Double.parseDouble(oxygenLevelField.getText());
-
+            
             // Save the inputted vital signs to the system or database
             saveVitals(weight, height, temperature, bloodPressure, oxygenLevel);
+        	}
+        	
+        	else {
+        		showError("Error", "Vitals can only be recorded for patients aged 12 or older, Please have parents approval.");
+        	}
+            
             
             vitalsStage.close();
         });
@@ -237,12 +250,13 @@ public class NurseDashboard {
         gridPane.setPadding(new Insets(20));
         gridPane.setAlignment(Pos.CENTER);
         gridPane.addRow(0, patientLabel, patientUsernameField);
-        gridPane.addRow(1, weightLabel, weightField);
-        gridPane.addRow(2, heightLabel, heightField);
-        gridPane.addRow(3, temperatureLabel, temperatureField);
-        gridPane.addRow(4, bloodPressureLabel, bloodPressureField);
-        gridPane.addRow(5, oxygenLevelLabel, oxygenLevelField);
-        gridPane.addRow(6, saveButton);
+        gridPane.addRow(1, ageLabel, ageField);
+        gridPane.addRow(2, weightLabel, weightField);
+        gridPane.addRow(3, heightLabel, heightField);
+        gridPane.addRow(4, temperatureLabel, temperatureField);
+        gridPane.addRow(5, bloodPressureLabel, bloodPressureField);
+        gridPane.addRow(6, oxygenLevelLabel, oxygenLevelField);
+        gridPane.addRow(7, saveButton);
 
         Scene scene = new Scene(gridPane, 400, 300);
         vitalsStage.setScene(scene);
