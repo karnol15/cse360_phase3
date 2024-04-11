@@ -102,8 +102,8 @@ public class DoctorDashboard {
         
         // Set action handlers for buttons (if needed)
         viewMedicalHistoryButton.setOnAction(e -> viewMedicalHistory());
-        makeAppointmentButton.setOnAction(e -> makeAppointment());
-        sendMessageToPatientButton.setOnAction(e -> openSendMessagePopup());
+       
+        sendMessageToPatientButton.setOnAction(e -> openReplyToPatientPopup());
         performPhysical.setOnAction(e->inputPhysicalData());
         prescribeMedicineButton.setOnAction(e->prescribeMedication());
         
@@ -181,44 +181,7 @@ public class DoctorDashboard {
         }*/
     }
 
-    private void makeAppointment() {
-        // Create a DatePicker to select the appointment date
-        DatePicker datePicker = new DatePicker();
-
-        // Set the date picker to allow selection of dates only in the future
-        datePicker.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                setDisable(empty || date.isBefore(LocalDate.now()));
-            }
-        });
-
-        // Create a grid pane to layout the date picker
-        GridPane gridPane = new GridPane();
-        gridPane.add(datePicker, 0, 0);
-
-        // Create an alert dialog to display the appointment form
-        Alert alert = new Alert(AlertType.NONE);
-        alert.setTitle("Make Appointment");
-        alert.getDialogPane().setContent(gridPane);
-        alert.getButtonTypes().add(ButtonType.OK);
-        alert.getButtonTypes().add(ButtonType.CANCEL);
-
-        // Show the alert dialog and handle the user's response
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            LocalDate selectedDate = datePicker.getValue();
-            if (selectedDate != null) {
-                // Perform appointment scheduling logic
-                // Here you can implement the logic to save the appointment to a database or perform other actions
-                System.out.println("Appointment scheduled for: " + selectedDate);
-            } else {
-                // No date selected, show an error message
-                showError("Error", "Please select a future date for the appointment.");
-            }
-        }
-    }
+   
 
     /* Helper method to show error messages
     private void showError(String title, String message) {
@@ -229,28 +192,46 @@ public class DoctorDashboard {
         alert.showAndWait();
     }*/
 
- // Method to open popup for sending message to patient
- 	private void openSendMessagePopup() {
- 	    // Create a new stage for the popup
- 	    Stage popupStage = new Stage();
+    // Method to open popup for sending message to patient
+ 	
+    private void openReplyToPatientPopup() {
+        // Create a new stage for the popup
+        Stage popupStage = new Stage();
 
- 	    // Layout for popup
- 	    BorderPane popupLayout = new BorderPane();
- 	    popupStage.setScene(new Scene(popupLayout, 400, 200));
- 	    popupStage.show();
+        // Create labels and text field for patient username input
+        Label usernameLabel = new Label("Enter patient's username:");
+        TextField usernameField = new TextField();
+        Button viewMessagesButton = new Button("View Messages");
 
-         String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday.substring(0,4);
+        // Layout for popup
+        VBox popupLayout = new VBox(10);
+        popupLayout.getChildren().addAll(usernameLabel, usernameField, viewMessagesButton);
+        popupLayout.setAlignment(Pos.CENTER);
+        popupStage.setScene(new Scene(popupLayout, 400, 200));
+        popupStage.show();
 
-         MessageSystem messageSystem = new MessageSystem(popupStage, userId);
-         messageSystem.show();
- 	}
-	
-	
-	// Helper method to send message to patient
-	private void sendMessageToPatient(String messageContent) {
-	    // Logic to send message to patient
-	    System.out.println("Message sent to patient: " + messageContent);
-	}
+        viewMessagesButton.setOnAction(e -> {
+            String patientUsername = usernameField.getText().trim();
+            if (!patientUsername.isEmpty()) {
+                // Check if conversation exists for the given patient username
+                if (conversationExists(patientUsername)) {
+                    // Initialize MessageSystem with patient's username
+                    MessageSystem messageSystem = new MessageSystem(patientUsername);
+                    messageSystem.replyToPatient(patientUsername);
+                } else {
+                    showError("Error", "No conversation exists with this patient.");
+                }
+            } else {
+                showError("Error", "Please enter the patient's username.");
+            }
+        });
+    }
+
+    private boolean conversationExists(String patientUsername) {
+        // Logic to check if conversation exists for the given patient username
+        return true; // Placeholder logic
+    }
+
 	
 	// Helper method to show error messages
 	private void showError(String title, String message) {

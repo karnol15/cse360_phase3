@@ -16,7 +16,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import java.time.format.DateTimeFormatter;
 import javafx.scene.control.DatePicker;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import java.time.LocalDate;
@@ -26,6 +25,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DateCell;
 
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 
 
 
@@ -72,7 +72,7 @@ public class NurseDashboard {
         
         // Set action handlers for buttons (if needed)
         viewMedicalHistoryButton.setOnAction(e -> viewMedicalHistory());
-        makeAppointmentButton.setOnAction(e -> makeAppointment());
+       
         sendMessageToPatientButton.setOnAction(e -> openSendMessagePopup());
         takeVitalsButton.setOnAction(e -> takeVitals()); // Action handler for taking vitals
     }
@@ -118,44 +118,7 @@ public class NurseDashboard {
 	        }
 	}
 
-    private void makeAppointment() {
-        // Create a DatePicker to select the appointment date
-        DatePicker datePicker = new DatePicker();
-
-        // Set the date picker to allow selection of dates only in the future
-        datePicker.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                setDisable(empty || date.isBefore(LocalDate.now()));
-            }
-        });
-
-        // Create a grid pane to layout the date picker
-        GridPane gridPane = new GridPane();
-        gridPane.add(datePicker, 0, 0);
-
-        // Create an alert dialog to display the appointment form
-        Alert alert = new Alert(AlertType.NONE);
-        alert.setTitle("Make Appointment");
-        alert.getDialogPane().setContent(gridPane);
-        alert.getButtonTypes().add(ButtonType.OK);
-        alert.getButtonTypes().add(ButtonType.CANCEL);
-
-        // Show the alert dialog and handle the user's response
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            LocalDate selectedDate = datePicker.getValue();
-            if (selectedDate != null) {
-                // Perform appointment scheduling logic
-                // Here you can implement the logic to save the appointment to a database or perform other actions
-                System.out.println("Appointment scheduled for: " + selectedDate);
-            } else {
-                // No date selected, show an error message
-                showError("Error", "Please select a future date for the appointment.");
-            }
-        }
-    }
+    
 
     // Helper method to show error messages
     /*private void showError(String title, String message) {
@@ -167,21 +130,44 @@ public class NurseDashboard {
     }*/
     
     
-    // Method to open popup for sending message to patient
-    private void openSendMessagePopup() {
-	    // Create a new stage for the popup
-	    Stage popupStage = new Stage();
+	private void openSendMessagePopup() {
+		// Create a new stage for the popup
+        Stage popupStage = new Stage();
 
-	    // Layout for popup
-	    BorderPane popupLayout = new BorderPane();
-	    popupStage.setScene(new Scene(popupLayout, 400, 200));
-	    popupStage.show();
+        // Create labels and text field for patient username input
+        Label usernameLabel = new Label("Enter patient's username:");
+        TextField usernameField = new TextField();
+        Button viewMessagesButton = new Button("View Messages");
 
-        String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday;
+        // Layout for popup
+        VBox popupLayout = new VBox(10);
+        popupLayout.getChildren().addAll(usernameLabel, usernameField, viewMessagesButton);
+        popupLayout.setAlignment(Pos.CENTER);
+        popupStage.setScene(new Scene(popupLayout, 400, 200));
+        popupStage.show();
 
-        MessageSystem messageSystem = new MessageSystem(popupStage, userId);
-        messageSystem.show();
-	}
+        viewMessagesButton.setOnAction(e -> {
+            String patientUsername = usernameField.getText().trim();
+            if (!patientUsername.isEmpty()) {
+                // Check if conversation exists for the given patient username
+                if (conversationExists(patientUsername)) {
+                    // Initialize MessageSystem with patient's username
+                    MessageSystem messageSystem = new MessageSystem(patientUsername);
+                    messageSystem.replyToPatient(patientUsername);
+                } else {
+                    showError("Error", "No conversation exists with this patient.");
+                }
+            } else {
+                showError("Error", "Please enter the patient's username.");
+            }
+        });
+    }
+	
+	private boolean conversationExists(String patientUsername) {
+        // Logic to check if conversation exists for the given patient username
+        return true; // Placeholder logic
+    }
+
 
     
 
@@ -201,10 +187,6 @@ public class NurseDashboard {
         // Create labels and text fields for vitals input
         Label patientLabel = new Label("Enter patients username:");
         TextField patientUsernameField = new TextField();
-        
-        Label ageLabel = new Label("Enter patients age:");
-        TextField ageField = new TextField();
-        
         Label weightLabel = new Label("Weight (kg):");
         TextField weightField = new TextField();
 
@@ -223,23 +205,14 @@ public class NurseDashboard {
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
             // Validate input data
-        	double age = Double.parseDouble(ageField.getText());
-        	
-        	if (age > 12) {
             double weight = Double.parseDouble(weightField.getText());
             double height = Double.parseDouble(heightField.getText());
             double temperature = Double.parseDouble(temperatureField.getText());
             String bloodPressure = bloodPressureField.getText();
             double oxygenLevel = Double.parseDouble(oxygenLevelField.getText());
-            
+
             // Save the inputted vital signs to the system or database
             saveVitals(weight, height, temperature, bloodPressure, oxygenLevel);
-        	}
-        	
-        	else {
-        		showError("Error", "Vitals can only be recorded for patients aged 12 or older, Please have parents approval.");
-        	}
-            
             
             vitalsStage.close();
         });
@@ -251,13 +224,12 @@ public class NurseDashboard {
         gridPane.setPadding(new Insets(20));
         gridPane.setAlignment(Pos.CENTER);
         gridPane.addRow(0, patientLabel, patientUsernameField);
-        gridPane.addRow(1, ageLabel, ageField);
-        gridPane.addRow(2, weightLabel, weightField);
-        gridPane.addRow(3, heightLabel, heightField);
-        gridPane.addRow(4, temperatureLabel, temperatureField);
-        gridPane.addRow(5, bloodPressureLabel, bloodPressureField);
-        gridPane.addRow(6, oxygenLevelLabel, oxygenLevelField);
-        gridPane.addRow(7, saveButton);
+        gridPane.addRow(1, weightLabel, weightField);
+        gridPane.addRow(2, heightLabel, heightField);
+        gridPane.addRow(3, temperatureLabel, temperatureField);
+        gridPane.addRow(4, bloodPressureLabel, bloodPressureField);
+        gridPane.addRow(5, oxygenLevelLabel, oxygenLevelField);
+        gridPane.addRow(6, saveButton);
 
         Scene scene = new Scene(gridPane, 400, 300);
         vitalsStage.setScene(scene);

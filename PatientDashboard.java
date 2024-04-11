@@ -15,7 +15,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -27,6 +26,8 @@ public class PatientDashboard {
     private String patientLastName;
     private int patientAge;
     private String patientBirthday;
+    private String userId;
+    MessageSystem messageSystem;
 
     public PatientDashboard(Stage primaryStage, Patient rlUser) {
         this.primaryStage = primaryStage;
@@ -38,6 +39,10 @@ public class PatientDashboard {
         LocalDate birthday = rlUser.getBirthday();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
         this.patientBirthday = birthday.format(formatter);	
+        
+        // Initialize MessageSystem
+        userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday;
+        messageSystem = new MessageSystem(userId);
         
         
     }
@@ -126,10 +131,7 @@ public class PatientDashboard {
         
     }
 
-    private Object sendMessageToStaff() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    
 
 	private void viewVisitHistory() {
 		Stage pickDateStage = new Stage();
@@ -333,29 +335,46 @@ public class PatientDashboard {
 	}
 	
 	private void openSendMessagePopup() {
-	    // Create a new stage for the popup
-	    Stage popupStage = new Stage();
+        // Create a popup window to get the staff username
+        Stage popupStage = new Stage();
 
-	    // Layout for popup
-	    BorderPane popupLayout = new BorderPane();
-	    popupStage.setScene(new Scene(popupLayout, 400, 200));
-	    popupStage.show();
+        // Layout for the popup
+        VBox popupLayout = new VBox(10);
+        popupStage.setScene(new Scene(popupLayout, 400, 200));
 
-        String userId = patientFirstName.substring(0, 1) + patientLastName + patientBirthday;
+        // Text field for entering the username
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter the username of the staff");
 
-        MessageSystem messageSystem = new MessageSystem(popupStage, userId);
-        messageSystem.show();
-	}
+        // Button to confirm the username input
+        Button confirmButton = new Button("Confirm");
+
+        // Event handler for the confirm button
+        confirmButton.setOnAction(event -> {
+            String username = usernameField.getText();
+            if (!username.isEmpty()) {
+                // Show the message system with the provided username
+                messageSystem.sendMessageToStaff(username);
+                popupStage.close();
+            } else {
+                showError("Error", "Please enter the username.");
+            }
+        });
+
+        // Add components to the layout
+        popupLayout.getChildren().addAll(usernameField, confirmButton);
+
+        // Show the popup stage
+        popupStage.show();
+    }
+
 
 	private void viewMedicalHistory() {
         // Implement functionality to view medical history
         System.out.println("Viewing medical history...");
     }
 
-    private void makeAppointment() {
-        // Implement functionality to make appointment
-        System.out.println("Making appointment...");
-    }
+   
     
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
