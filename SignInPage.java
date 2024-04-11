@@ -7,15 +7,15 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 public class SignInPage {
@@ -131,15 +131,15 @@ public class SignInPage {
                 // Perform authentication logic
                 User userType = authenticate(username, password);
                 
-                if (userType instanceof Nurse) {
+                if (userType != null) {
                     // Authentication successful, open dashboard based on role
-                    openNurseDashboard(username);
-                } else if (userType instanceof Doctor) {
-                	
-                	openDoctorDashboard(username);
-                    // Authentication failed, show error message
-                }
-                else {showError("Error", "Incorrect username or password. Please try again.");}
+                    if (userType instanceof Nurse) {
+                        openNurseDashboard(userType);
+                    } else if (userType instanceof Doctor) {
+                        openDoctorDashboard(userType);
+                    }
+                } else {
+                    showError("Error", "Incorrect username or password. Please try again.");}
             }
         });
         
@@ -172,19 +172,18 @@ public class SignInPage {
         return null;
     }
 
-    private void openNurseDashboard(String username) {
+    private void openNurseDashboard(User user) {
         // Open dashboard based on the role of the user
-        // For demonstration purposes, let's assume there is only one dashboard for all users
-        // Replace "DashboardPage" with the appropriate dashboard class based on the user's role
-        NurseDashboard dashboardPage = new NurseDashboard(primaryStage, "john", "doe", 30, "today");
+       
+        NurseDashboard dashboardPage = new NurseDashboard(primaryStage, user);
         dashboardPage.show();
     }
     
-    private void openDoctorDashboard(String username) {
+    private void openDoctorDashboard(User user) {
         // Open dashboard based on the role of the user
         // For demonstration purposes, let's assume there is only one dashboard for all users
         // Replace "DashboardPage" with the appropriate dashboard class based on the user's role
-        DoctorDashboard dashboardPage = new DoctorDashboard(primaryStage, "john", "doe", 30, "today");
+        DoctorDashboard dashboardPage = new DoctorDashboard(primaryStage, user);
         dashboardPage.show();
     }
     

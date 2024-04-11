@@ -10,45 +10,33 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import java.time.format.DateTimeFormatter;
-import javafx.scene.control.DatePicker;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.util.Callback;
-import java.time.LocalDate;
-import java.util.Optional;
-
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DateCell;
-
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 
 
 public class NurseDashboard {
     private Stage primaryStage;
-    private String patientFirstName;
-    private String patientLastName;
-    private int patientAge;
-    private String patientBirthday;
+    private String nurseFirstName;
+    private String nurseLastName;
+    
+    private String nurseBirthday;
 
-    public NurseDashboard(Stage primaryStage, String firstName, String lastName, int age, String birthday) {
+    public NurseDashboard(Stage primaryStage, User user) {
         this.primaryStage = primaryStage;
-        this.patientFirstName = firstName;
-        this.patientLastName = lastName;
-        this.patientAge = age;
-        this.patientBirthday = birthday;
+        this.nurseFirstName = user.getFName();
+        this.nurseLastName = user.getFName();
+        
+        this.nurseBirthday = user.getbDay();
     }
 
     public void show() {
@@ -71,7 +59,7 @@ public class NurseDashboard {
         logoBox.setPrefWidth(750);
 
         Label dashLabel = new Label("Nurse Dashboard");
-        dashLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        dashLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
         // Display nurse information
         Label welcomeLabel = new Label("Welcome back, Nurse");
@@ -282,7 +270,7 @@ public class NurseDashboard {
             if (!patientUsername.isEmpty()) {
                 // Initialize MessageSystem with patient's username
                 MessageSystem messageSystem = new MessageSystem(patientUsername);
-                messageSystem.sendMessageToStaff(patientUsername);
+                messageSystem.replyToPatient(patientUsername);
             } else {
                 showError("Error", "Please enter the patient's username.");
             }

@@ -1,16 +1,26 @@
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class MessageSystem extends Application {
   private String userId;
@@ -125,10 +135,10 @@ public class MessageSystem extends Application {
 	            
 	            // Display messages in the correct order
 	            for (String message : messages) {
-	                String[] parts = message.split(": ", 2);
-	                if (parts.length == 2) {
-	                    String sender = parts[0];
-	                    String messageContent = parts[1];
+	                String[] parts = message.split(": ", 3);
+	                if (parts.length == 3) {
+	                    String sender = parts[1];
+	                    String messageContent = parts[2];
 	                    conversationArea.appendText("From: " + sender + "\nMessage: " + messageContent + "\n\n");
 	                }
 	            }
