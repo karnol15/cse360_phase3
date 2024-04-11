@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import javafx.event.ActionEvent;
@@ -47,7 +49,7 @@ public class DoctorDashboard {
         primaryStage.setTitle("Doctor Dashboard");
 
         // Create an ImageView with the image
-        Image image = new Image("doctorDashIMG.jpg"); 
+        Image image = new Image("nurseDashBanner.jpg"); 
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(500);
         
@@ -77,7 +79,7 @@ public class DoctorDashboard {
 
         // Buttons for various actions
         Button viewMedicalHistoryButton = new Button("View Medical History");
-        Button makeAppointmentButton = new Button("Make Appointment");
+        
         Button sendMessageToPatientButton = new Button("Send Message to Patient");
         Button prescribeMedicineButton = new Button("Prescribe Medicine");
         Button performPhysical = new Button("Perform Physical");
@@ -93,7 +95,7 @@ public class DoctorDashboard {
         buttonsLayout.getChildren().addAll(viewMedicalHistoryButton, prescribeMedicineButton,performPhysical, sendMessageToPatientButton);
         buttonsLayout.setAlignment(Pos.CENTER);
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(dashLabel, welcomeLabel, actionLabel, buttonsLayout, logOutButton);
+        layout.getChildren().addAll(dashLabel, logoBox, welcomeLabel, actionLabel, buttonsLayout, logOutButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
@@ -118,70 +120,134 @@ public class DoctorDashboard {
     }
 
     private void viewMedicalHistory() {
-        // Assuming the medical history files are stored in a specific directory
-        
-    	// Create labels and text fields for medication details
-    	Label patientUsername = new Label("Enter the Patients username whose history you wish to view:");
+        // Create labels and text fields for medication details
+        Label patientUsername = new Label("Enter the Patient's username whose history you wish to view:");
         TextField usernameField = new TextField();
         HBox fieldBox = new HBox(usernameField);
-        fieldBox.setPrefWidth(150);
+        fieldBox.setPrefWidth(250);
         fieldBox.setAlignment(Pos.CENTER);
-    
+
         // Create a button to save the entered findings
-        Button confirmButton = new Button("Retrive Medical Histrory");
-        
-       
-       
-        
+        Button confirmButton = new Button("Retrieve Medical History");
+
         VBox confirmBox = new VBox(10);
         confirmBox.getChildren().addAll(patientUsername, fieldBox, confirmButton);
         confirmBox.setAlignment(Pos.CENTER);
+
         // Create a new stage for recording findings
         Stage findingsStage = new Stage();
-        findingsStage.setTitle("Enter Patients Username");
+        findingsStage.setTitle("View Medical History");
         findingsStage.setScene(new Scene(confirmBox, 400, 250));
         findingsStage.show();
-        /*
-    	String medicalHistoryDirectory = "medical_history/";
-        
-        // Constructing the file path based on the patient's username
-        String username = "patient_username"; // You should replace this with the actual patient's username
-        String medicalHistoryFilePath = medicalHistoryDirectory + username + "_medical_history.txt";
 
-        // Open the medical history file and display its content in a dialog window
-        try {
-            File file = new File(medicalHistoryFilePath);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            
-            StringBuilder medicalHistoryContent = new StringBuilder();
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                medicalHistoryContent.append(line).append("\n");
+        confirmButton.setOnAction(e -> {
+            String username = usernameField.getText().trim();
+            if (!username.isEmpty()) {
+                displayMedicalHistory(username);
+                findingsStage.close();
+            } else {
+                showAlert("Error", "Please enter the patient's username.");
             }
-            
-            bufferedReader.close();
-
-            // Show the medical history content in an alert dialog
-            Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Medical History");
-            alert.setHeaderText("Medical History for " + patientFirstName + " " + patientLastName);
-            alert.setContentText(medicalHistoryContent.toString());
-            alert.showAndWait();
-            
-        } catch (IOException e) {
-            // Handle file not found or other IO exceptions
-            e.printStackTrace();
-            // Show an error dialog to the user
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error viewing medical history");
-            alert.setContentText("Could not find medical history for the patient.");
-            alert.showAndWait();
-        }*/
+        });
     }
 
-   
+
+    private void displayMedicalHistory(String username) {
+        // Logic to read medical history from the file and display it in the text areas
+        String medicalHistoryDirectory = "medical_history/";
+        String medicalHistoryFilePath = medicalHistoryDirectory + username + "_medical_history.txt";
+
+        try {
+            // Open the medical history file
+            File file = new File(medicalHistoryFilePath);
+            if (!file.exists()) {
+                // If the file does not exist, create it
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs(); // Create parent directories if they don't exist
+                }
+                file.createNewFile(); // Create the file
+            }
+
+            // Create text areas for medical history data
+            TextArea healthIssuesTextArea = new TextArea();
+            TextArea prescriptionsTextArea = new TextArea();
+            TextArea immunizationsTextArea = new TextArea();
+            TextArea recommendationsTextArea = new TextArea();
+            // Set  height for each text area
+            healthIssuesTextArea.setPrefHeight(80); // Adjust the height as needed
+            prescriptionsTextArea.setPrefHeight(80);
+            immunizationsTextArea.setPrefHeight(80);
+            recommendationsTextArea.setPrefHeight(80);
+
+            // Read the medical history from the file and populate the text areas
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            // Read each line and set the text of corresponding text areas
+            healthIssuesTextArea.setText(bufferedReader.readLine());
+            prescriptionsTextArea.setText(bufferedReader.readLine());
+            immunizationsTextArea.setText(bufferedReader.readLine());
+            recommendationsTextArea.setText(bufferedReader.readLine());
+
+            bufferedReader.close();
+
+            // Create a GridPane to display the medical history
+            GridPane gridPane = new GridPane();
+            gridPane.setPadding(new Insets(10));
+            gridPane.setVgap(10);
+            gridPane.setHgap(10);
+
+            // Add labels and text areas to the grid pane
+            gridPane.add(new Label("Health Issues:"), 0, 0);
+            gridPane.add(healthIssuesTextArea, 1, 0);
+            gridPane.add(new Label("Prescriptions:"), 0, 1);
+            gridPane.add(prescriptionsTextArea, 1, 1);
+            gridPane.add(new Label("Immunizations:"), 0, 2);
+            gridPane.add(immunizationsTextArea, 1, 2);
+            gridPane.add(new Label("Recommendations:"), 0, 3);
+            gridPane.add(recommendationsTextArea, 1, 3);
+
+            // Add save button to the grid pane
+            Button saveButton = new Button("Save");
+            gridPane.add(saveButton, 1, 4);
+
+            // Action handler for the save button
+            saveButton.setOnAction(event -> {
+                try {
+                    FileWriter fileWriter = new FileWriter(file);
+                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+                    // Write the text from text areas to the file
+                    bufferedWriter.write(healthIssuesTextArea.getText() + "\n");
+                    bufferedWriter.write(prescriptionsTextArea.getText() + "\n");
+                    bufferedWriter.write(immunizationsTextArea.getText() + "\n");
+                    bufferedWriter.write(recommendationsTextArea.getText() + "\n");
+
+                    bufferedWriter.close();
+
+                    // Show a confirmation message
+                    showAlert("Success", "Medical history saved successfully.");
+                } catch (IOException e) {
+                    // Handle file writing errors
+                    e.printStackTrace();
+                    showAlert("Error", "Failed to save medical history.");
+                }
+            });
+
+            // Show the medical history UI containing the GridPane
+            Stage medicalHistoryStage = new Stage();
+            medicalHistoryStage.setTitle("Medical History");
+            medicalHistoryStage.setScene(new Scene(gridPane));
+            medicalHistoryStage.show();
+
+        } catch (IOException e) {
+            // Handle file creation or reading errors
+            e.printStackTrace();
+            // Show an error dialog to the user
+            showAlert("Error", "Failed to read medical history.");
+        }
+    }
+
 
     /* Helper method to show error messages
     private void showError(String title, String message) {
@@ -213,26 +279,24 @@ public class DoctorDashboard {
         viewMessagesButton.setOnAction(e -> {
             String patientUsername = usernameField.getText().trim();
             if (!patientUsername.isEmpty()) {
-                // Check if conversation exists for the given patient username
-                if (conversationExists(patientUsername)) {
-                    // Initialize MessageSystem with patient's username
-                    MessageSystem messageSystem = new MessageSystem(patientUsername);
-                    messageSystem.replyToPatient(patientUsername);
-                } else {
-                    showError("Error", "No conversation exists with this patient.");
-                }
+                // Initialize MessageSystem with patient's username
+                MessageSystem messageSystem = new MessageSystem(patientUsername);
+                messageSystem.replyToPatient(patientUsername);
             } else {
                 showError("Error", "Please enter the patient's username.");
             }
         });
     }
-
-    private boolean conversationExists(String patientUsername) {
-        // Logic to check if conversation exists for the given patient username
-        return true; // Placeholder logic
-    }
-
 	
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+    
+    
 	// Helper method to show error messages
 	private void showError(String title, String message) {
 	    Alert alert = new Alert(Alert.AlertType.ERROR);
