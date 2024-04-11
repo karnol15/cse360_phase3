@@ -19,9 +19,6 @@ public class User implements Serializable {
 	public String getFName() {return fName;}
 	public String getLName() {return lName;}
 	public String getbDay() {return birthday.toString();}
-	public LocalDate getBirthday() {
-        return birthday;
-    }
 	public int getAge() {
 		
 		if (LocalDate.now().compareTo(birthday) - 1 <= 0) {

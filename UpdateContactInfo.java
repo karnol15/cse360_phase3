@@ -82,7 +82,7 @@ public class UpdateContactInfo {
               
             }
             else {
-            	user.addContactInfo(firstName, lastName, birthday);
+            	//user.addContactInfo(firstName, lastName, birthday);
             	showConfirmation();
             }
         });

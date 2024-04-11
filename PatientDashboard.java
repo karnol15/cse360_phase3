@@ -1,3 +1,9 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -14,9 +20,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class PatientDashboard {
@@ -141,7 +147,8 @@ public class PatientDashboard {
         Label pickDateLabel = new Label("Please select the date of the visit you wish to view: ");
         DatePicker datePicker = new DatePicker();
 
-        Button confirmButton = new Button("Confirm date");
+        Button confirmButton = new Button("Show Vitals");
+        Button prescription = new Button("Show Prescriptions");
         Button cancelButton = new Button("Cancel");
         
        
@@ -155,12 +162,14 @@ public class PatientDashboard {
         gridPane.addRow(0, pickDateLabel);
         gridPane.addRow(1, datePicker);
         gridPane.addRow(2, confirmButton);
-        gridPane.addRow(3, cancelButton);
+        gridPane.addRow(3, prescription);
+        gridPane.addRow(4, cancelButton);
         
         GridPane.setHalignment(pickDateLabel, HPos.CENTER);
         GridPane.setHalignment(datePicker, HPos.CENTER);
         GridPane.setHalignment(confirmButton, HPos.CENTER);
         GridPane.setHalignment(cancelButton, HPos.CENTER);
+        GridPane.setHalignment(prescription,  HPos.CENTER);
 
         
 
@@ -171,10 +180,20 @@ public class PatientDashboard {
         
         //handle events below here
         confirmButton.setOnAction(e -> {
-            // Validate input data
+            String filename = "medical_history/" + userId + "_" + datePicker.getValue() + "_medical_history.txt";
+            
+            showVitals(filename);
             
             
         	pickDateStage.close();
+        });
+        
+        prescription.setOnAction(e -> {
+        	
+        	String medicalHistoryDirectory = "medical_history/";
+            String filename = medicalHistoryDirectory + userId + "_" + datePicker.getValue() + "_prescriptions.txt";
+        	
+        	showPrescription(filename);
         });
         
         cancelButton.setOnAction(e -> {
@@ -182,6 +201,134 @@ public class PatientDashboard {
         	pickDateStage.close();
         });
 	}
+	
+	private void showPrescription(String filename) {
+        // Create labels and text fields for medication details
+
+        Label medicationNameLabel = new Label("Medication Name:");
+        TextField medicationNameField = new TextField();
+        
+        medicationNameField.setEditable(false);
+    
+        Label dosageLabel = new Label("Dosage:");
+        TextField dosageField = new TextField();
+        dosageField.setEditable(false);
+    
+        Label frequencyLabel = new Label("Frequency:");
+        TextField frequencyField = new TextField();
+        frequencyField.setEditable(false);
+    
+        Label instructionsLabel = new Label("Instructions:");
+        TextField instructionsField = new TextField();
+        instructionsField.setEditable(false);
+        
+        File file = new File(filename);
+        
+        try {
+        	FileReader fr = new FileReader(file);
+        	BufferedReader br = new BufferedReader(fr);
+        	
+        	medicationNameField.setText(br.readLine());
+        	dosageField.setText(br.readLine());
+        	frequencyField.setText(br.readLine());
+        	instructionsField.setText(br.readLine());
+        	
+        } catch (IOException e1) {
+        	showError("Error", "Something went wrong!");
+        }
+    
+    
+    
+        // Create a layout to arrange the input components
+        
+        // Create grid layout for the vitals input fields
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.addRow(1, medicationNameLabel, medicationNameField);
+        gridPane.addRow(2, dosageLabel, dosageField);
+        gridPane.addRow(3, frequencyLabel, frequencyField);
+        gridPane.addRow(4, instructionsLabel, instructionsField);
+      
+        
+    
+        // Create a new stage for prescribing medication
+        Stage prescribeMedicationStage = new Stage();
+        prescribeMedicationStage.setTitle("Prescribe Medication");
+        prescribeMedicationStage.setScene(new Scene(gridPane));
+        prescribeMedicationStage.show();
+    }
+	
+	private void showVitals(String filename) {
+        Stage vitalsStage = new Stage();
+        vitalsStage.setTitle("Appointment Vitals");
+
+        // Create labels and text fields for vitals input
+        Label weightLabel = new Label("Weight (kg):");
+        TextField weightField = new TextField();
+        weightField.setEditable(false);
+
+        Label heightLabel = new Label("Height (cm):");
+        TextField heightField = new TextField();
+        heightField.setEditable(false);
+
+        Label temperatureLabel = new Label("Body Temperature (°C):");
+        TextField temperatureField = new TextField();
+        temperatureField.setEditable(false);
+
+        Label bloodPressureLabel = new Label("Blood Pressure (mmHg):");
+        TextField bloodPressureField = new TextField();
+        bloodPressureField.setEditable(false);
+
+        Label oxygenLevelLabel = new Label("Oxygen Level (%):");
+        TextField oxygenLevelField = new TextField();
+        oxygenLevelField.setEditable(false);
+             
+
+        // Create grid layout for the vitals input fields
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.addRow(0, weightLabel, weightField);
+        gridPane.addRow(1, heightLabel, heightField);
+        gridPane.addRow(2, temperatureLabel, temperatureField);
+        gridPane.addRow(3, bloodPressureLabel, bloodPressureField);
+        gridPane.addRow(4, oxygenLevelLabel, oxygenLevelField);
+        
+        File file = new File(filename);
+        
+        if (!file.exists()) {
+        	showError("Error", "There are no details from this visit.");
+        	return;
+        }
+        
+        try {
+        	FileReader fr = new FileReader(file);
+        	BufferedReader br = new BufferedReader(fr);
+        	
+        	weightField.setText(br.readLine());
+        	heightField.setText(br.readLine());
+        	temperatureField.setText(br.readLine());
+        	bloodPressureField.setText(br.readLine());
+        	oxygenLevelField.setText(br.readLine());
+        	
+        	br.close();
+        	
+        } catch (IOException e) {
+        	showError("Error", "Something went wrong!");
+        }
+        
+
+        Scene scene = new Scene(gridPane, 400, 270);
+        vitalsStage.setScene(scene);
+        vitalsStage.show();
+        
+        
+    }
 
 	private void updateContactInfo() {
 		Stage contactInfoStage = new Stage();
@@ -313,6 +460,10 @@ public class PatientDashboard {
         gridPane.addRow(3, returnButton);
         
         
+        
+
+
+        
 
         Scene scene = new Scene(gridPane, 400, 300);
         contactInfoStage.setScene(scene);
@@ -331,23 +482,22 @@ public class PatientDashboard {
 	}
 	
 	private void openSendMessagePopup() {
-		// Create a new stage for the popup
+        // Create a popup window to get the staff username
         Stage popupStage = new Stage();
 
-        // Create labels and text field for patient username input
-        Label usernameLabel = new Label("Enter staff's username:");
-        TextField usernameField = new TextField();
-        Button sendMessageButton = new Button("View Messages");
-
-        // Layout for popup
+        // Layout for the popup
         VBox popupLayout = new VBox(10);
-        popupLayout.getChildren().addAll(usernameLabel, usernameField, sendMessageButton);
-        popupLayout.setAlignment(Pos.CENTER);
         popupStage.setScene(new Scene(popupLayout, 400, 200));
-        popupStage.show();
+
+        // Text field for entering the username
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter the username of the staff");
+
+        // Button to confirm the username input
+        Button confirmButton = new Button("Confirm");
 
         // Event handler for the confirm button
-        sendMessageButton.setOnAction(event -> {
+        confirmButton.setOnAction(event -> {
             String username = usernameField.getText();
             if (!username.isEmpty()) {
                 // Show the message system with the provided username
@@ -358,9 +508,17 @@ public class PatientDashboard {
             }
         });
 
+        // Add components to the layout
+        popupLayout.getChildren().addAll(usernameField, confirmButton);
 
         // Show the popup stage
         popupStage.show();
+    }
+
+
+	private void viewMedicalHistory() {
+        // Implement functionality to view medical history
+        System.out.println("Viewing medical history...");
     }
 
    
