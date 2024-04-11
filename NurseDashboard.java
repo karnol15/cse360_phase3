@@ -10,47 +10,33 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-
-import javafx.scene.control.DatePicker;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.util.Callback;
-import java.time.LocalDate;
-import java.util.Optional;
-
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DateCell;
-
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 
 
 public class NurseDashboard {
     private Stage primaryStage;
-    private String patientFirstName;
-    private String patientLastName;
-    private int patientAge;
-    private String patientBirthday;
+    private String nurseFirstName;
+    private String nurseLastName;
+    
+    private String nurseBirthday;
 
-    public NurseDashboard(Stage primaryStage, String firstName, String lastName, int age, String birthday) {
+    public NurseDashboard(Stage primaryStage, User user) {
         this.primaryStage = primaryStage;
-        this.patientFirstName = firstName;
-        this.patientLastName = lastName;
-        this.patientAge = age;
-        this.patientBirthday = birthday;
+        this.nurseFirstName = user.getFName();
+        this.nurseLastName = user.getLName();
+        
+        this.nurseBirthday = user.getbDay();
     }
 
     public void show() {
@@ -73,7 +59,7 @@ public class NurseDashboard {
         logoBox.setPrefWidth(750);
 
         Label dashLabel = new Label("Nurse Dashboard");
-        dashLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        dashLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
         // Display nurse information
         Label welcomeLabel = new Label("Welcome back, Nurse");
@@ -284,7 +270,7 @@ public class NurseDashboard {
             if (!patientUsername.isEmpty()) {
                 // Initialize MessageSystem with patient's username
                 MessageSystem messageSystem = new MessageSystem(patientUsername);
-                messageSystem.sendMessageToStaff(patientUsername);
+                messageSystem.replyToPatient(patientUsername);
             } else {
                 showError("Error", "Please enter the patient's username.");
             }
@@ -324,33 +310,18 @@ public class NurseDashboard {
         TextField oxygenLevelField = new TextField();
 
         Button saveButton = new Button("Save");
-        
-        DatePicker dater = new DatePicker();
-        
         saveButton.setOnAction(e -> {
             // Validate input data
-        	try {
-        	
-        		String username = patientUsernameField.getText();
-	            double weight = Double.parseDouble(weightField.getText());
-	            double height = Double.parseDouble(heightField.getText());
-	            double temperature = Double.parseDouble(temperatureField.getText());
-	            String bloodPressure = bloodPressureField.getText();
-	            double oxygenLevel = Double.parseDouble(oxygenLevelField.getText());
-	            
-	            LocalDate date = dater.getValue();
-	         
-	            
-	            saveVitals(weight, height, temperature, bloodPressure, oxygenLevel, date, username);
-	            vitalsStage.close();
-
-        	} catch (Exception e1)
-        	{
-        		showError("Error", "Please fill out all fields.");
-        	}
+            double weight = Double.parseDouble(weightField.getText());
+            double height = Double.parseDouble(heightField.getText());
+            double temperature = Double.parseDouble(temperatureField.getText());
+            String bloodPressure = bloodPressureField.getText();
+            double oxygenLevel = Double.parseDouble(oxygenLevelField.getText());
 
             // Save the inputted vital signs to the system or database
+            saveVitals(weight, height, temperature, bloodPressure, oxygenLevel);
             
+            vitalsStage.close();
         });
 
         // Create grid layout for the vitals input fields
@@ -365,47 +336,21 @@ public class NurseDashboard {
         gridPane.addRow(3, temperatureLabel, temperatureField);
         gridPane.addRow(4, bloodPressureLabel, bloodPressureField);
         gridPane.addRow(5, oxygenLevelLabel, oxygenLevelField);
-        gridPane.addRow(6,  new Label("Appt. Date:"), dater);
-        gridPane.addRow(7, saveButton);
+        gridPane.addRow(6, saveButton);
 
-        Scene scene = new Scene(gridPane, 400, 320);
+        Scene scene = new Scene(gridPane, 400, 300);
         vitalsStage.setScene(scene);
         vitalsStage.show();
     }
 
-    private void saveVitals(double weight, double height, double temperature, String bloodPressure, double oxygenLevel, LocalDate date, String username) {
+    private void saveVitals(double weight, double height, double temperature, String bloodPressure, double oxygenLevel) {
         // Implement logic to save the inputted vital signs to the system or database
-        
-        String medicalHistoryDirectory = "medical_history/";
-        String medicalHistoryFilePath = medicalHistoryDirectory + username + "_" + date + "_medical_history.txt";
-        
-        
-        try {
-	        File file = new File(medicalHistoryFilePath);
-	        if (!file.exists()) {
-	            // If the file does not exist, create it
-	            if (!file.getParentFile().exists()) {
-	                file.getParentFile().mkdirs(); // Create parent directories if they don't exist
-	            }
-	            file.createNewFile(); // Create the file
-	        }
-	        
-	        FileWriter fileWriter = new FileWriter(file);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            
-            bufferedWriter.write(weight + "\n");
-            bufferedWriter.write(height + "\n");
-            bufferedWriter.write(temperature + "\n");
-            bufferedWriter.write(bloodPressure + "\n");
-            bufferedWriter.write(oxygenLevel + "\n");
-
-            bufferedWriter.close();
-            
-            
-	  
-        } catch (IOException e3) {
-        	showError("Error", "Something went wrong!");
-        }
+        System.out.println("Vitals saved:");
+        System.out.println("Weight: " + weight + " lbs");
+        System.out.println("Height: " + height + " cm");
+        System.out.println("Temperature: " + temperature + " °F");
+        System.out.println("Blood Pressure: " + bloodPressure + " mmHg");
+        System.out.println("Oxygen Level: " + oxygenLevel + " %");
         
         
     }

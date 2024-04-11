@@ -1,8 +1,6 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,9 +18,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class PatientDashboard {
@@ -139,7 +137,7 @@ public class PatientDashboard {
 
     
 
-	private void viewVisitHistory() {
+    private void viewVisitHistory() {
 		Stage pickDateStage = new Stage();
 		pickDateStage.setTitle("Pick Visit Date");
 
@@ -201,8 +199,8 @@ public class PatientDashboard {
         	pickDateStage.close();
         });
 	}
-	
-	private void showPrescription(String filename) {
+    
+    private void showPrescription(String filename) {
         // Create labels and text fields for medication details
 
         Label medicationNameLabel = new Label("Medication Name:");
@@ -460,10 +458,6 @@ public class PatientDashboard {
         gridPane.addRow(3, returnButton);
         
         
-        
-
-
-        
 
         Scene scene = new Scene(gridPane, 400, 300);
         contactInfoStage.setScene(scene);
@@ -482,22 +476,23 @@ public class PatientDashboard {
 	}
 	
 	private void openSendMessagePopup() {
-        // Create a popup window to get the staff username
+		// Create a new stage for the popup
         Stage popupStage = new Stage();
 
-        // Layout for the popup
-        VBox popupLayout = new VBox(10);
-        popupStage.setScene(new Scene(popupLayout, 400, 200));
-
-        // Text field for entering the username
+        // Create labels and text field for patient username input
+        Label usernameLabel = new Label("Enter staff's username:");
         TextField usernameField = new TextField();
-        usernameField.setPromptText("Enter the username of the staff");
+        Button sendMessageButton = new Button("View Messages");
 
-        // Button to confirm the username input
-        Button confirmButton = new Button("Confirm");
+        // Layout for popup
+        VBox popupLayout = new VBox(10);
+        popupLayout.getChildren().addAll(usernameLabel, usernameField, sendMessageButton);
+        popupLayout.setAlignment(Pos.CENTER);
+        popupStage.setScene(new Scene(popupLayout, 400, 200));
+        popupStage.show();
 
         // Event handler for the confirm button
-        confirmButton.setOnAction(event -> {
+        sendMessageButton.setOnAction(event -> {
             String username = usernameField.getText();
             if (!username.isEmpty()) {
                 // Show the message system with the provided username
@@ -508,17 +503,9 @@ public class PatientDashboard {
             }
         });
 
-        // Add components to the layout
-        popupLayout.getChildren().addAll(usernameField, confirmButton);
 
         // Show the popup stage
         popupStage.show();
-    }
-
-
-	private void viewMedicalHistory() {
-        // Implement functionality to view medical history
-        System.out.println("Viewing medical history...");
     }
 
    
