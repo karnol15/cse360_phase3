@@ -1,2 +1,4 @@
 # cse360_phase3
-its phase 3 due 4/10 lets get this shit doneeee
+This is a portal for a medical healthcare professional system. Patients can sign-in and visit their doctor and communicate with them about their health and healthcare.
+
+
